@@ -279,6 +279,67 @@
 
   /* Tips */
   .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.2rem; }
+  .tip-extra { margin-top: .4rem; display: flex; gap: .8rem; flex-wrap: wrap; font-size: .8rem; }
+  .tip-extra a { color: var(--gold); text-decoration: none; border-bottom: 1px dotted var(--gold); }
+  .tip-extra .addr { color: var(--ink-soft); }
+
+  /* 美食地图按钮 */
+  .food-card .map-btn {
+    margin-top: .4rem; align-self: flex-start;
+    background: var(--pink); color: #fff;
+    padding: .2rem .8rem; border-radius: 999px;
+    font-size: .78rem; text-decoration: none;
+  }
+  .food-card .addr { font-size: .76rem; color: var(--ink-soft); }
+
+  /* 迪士尼海洋专题 */
+  .disney-guide {
+    background: linear-gradient(160deg, #fff 0%, #fff5f7 100%);
+    border-radius: 24px;
+    padding: 2rem 1.8rem;
+    box-shadow: var(--shadow-strong);
+    border: 1px solid rgba(255,138,171,.2);
+  }
+  .disney-head { text-align: center; margin-bottom: 1.5rem; }
+  .disney-head h3 {
+    font-size: 2rem; color: var(--pink-deep);
+    margin-bottom: .3rem;
+  }
+  .disney-head h3::before, .disney-head h3::after {
+    content: "✦"; color: var(--pink); margin: 0 .8rem; font-size: 1.2rem;
+  }
+  .disney-head .sub { color: var(--gold); letter-spacing: .15em; font-size: .85rem; }
+  .disney-head .intro { max-width: 640px; margin: .8rem auto 0; color: var(--ink); font-size: .92rem; line-height: 1.7; }
+  .disney-section { margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px dashed var(--pink-soft); }
+  .disney-section-head { display: flex; align-items: center; gap: .6rem; margin-bottom: 1rem; }
+  .disney-section-head .ico { font-size: 1.4rem; }
+  .disney-section-head h4 { color: var(--pink-deep); font-size: 1.2rem; }
+  .disney-grid {
+    display: grid; grid-template-columns: 100px 1fr;
+    gap: .5rem 1rem; align-items: start;
+  }
+  .disney-grid .t {
+    background: var(--pink); color: #fff;
+    padding: .15rem .5rem; border-radius: 6px;
+    font-size: .82rem; font-weight: 600;
+    text-align: center;
+  }
+  .disney-grid .w { padding-bottom: .5rem; border-bottom: 1px dotted var(--pink-soft); }
+  .disney-grid .w b { display: block; font-weight: 600; color: var(--ink); margin-bottom: .1rem; }
+  .disney-grid .w small { color: var(--ink-soft); font-size: .82rem; }
+  .disney-highlight {
+    background: linear-gradient(120deg,#ffeef5,#fffaf0);
+    border: 2px solid var(--pink);
+    border-radius: 18px;
+    padding: 1.2rem 1.4rem;
+    margin: 1rem 0;
+  }
+  .disney-highlight .label {
+    display: inline-block; background: var(--pink-deep); color: #fff;
+    padding: .15rem .8rem; border-radius: 999px; font-size: .78rem;
+    margin-bottom: .6rem;
+  }
+  .disney-highlight h4 { font-size: 1.3rem; color: var(--pink-deep); margin-bottom: .8rem; }
   .tip {
     background: #fff; border-radius: 18px; padding: 1.3rem;
     box-shadow: var(--shadow); position: relative;
@@ -326,6 +387,7 @@
   <a href="#days">9 天行程</a>
   <a href="#food">美食地图</a>
   <a href="#attractions">景点详情</a>
+  <a href="#disney">海洋攻略</a>
   <a href="#photos">我的相册</a>
   <a href="#tips">攻略 Tips</a>
   <a href="gallery.html">🎨 切换风格</a>
@@ -368,6 +430,14 @@
   <div class="attractions" id="attractions"></div>
 </section>
 
+<section id="disney">
+  <div class="section-head">
+    <h2>迪士尼海洋穷游攻略</h2>
+    <p>SPECIAL · BUDGET GUIDE</p>
+  </div>
+  <div class="disney-guide" id="disney-guide"></div>
+</section>
+
 <section id="photos">
   <div class="section-head">
     <h2>我的相册</h2>
@@ -393,6 +463,9 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
   const D = window.GUIDE_DATA;
+  const H = window.GUIDE_HELPERS;
+  const tripDates = H.tripDates();
+  D.meta.dateRange = `${H.fmtFull(tripDates[0])} — ${H.fmtFull(tripDates[8])}`;
   document.title = "春节东京攻略 · 樱花粉彩";
   document.getElementById('date-range').textContent = D.meta.dateRange;
   document.getElementById('travelers').textContent = D.meta.travelers;
@@ -409,15 +482,18 @@
     petalBox.appendChild(p);
   }
 
-  // 行程
+  // 行程 — 动态日期
   const tl = document.getElementById('timeline');
-  D.days.forEach(d => {
+  D.days.forEach((d, i) => {
+    const dateObj = tripDates[i];
+    const dateStr = H.fmt(dateObj);
+    const wd = H.weekday(dateObj);
     const card = document.createElement('div');
     card.className = 'day-card';
     card.innerHTML = `
       <div class="day-head">
         <div>
-          <div class="day-date">DAY ${d.idx} · ${d.date}</div>
+          <div class="day-date">DAY ${d.idx} · ${dateStr} ${wd}</div>
           <div class="day-title">${d.title}<span class="day-lunar">${d.lunar}</span></div>
           <div class="day-city">📍 ${d.city}</div>
         </div>
@@ -446,9 +522,10 @@
         <div class="food-card">
           <div class="food-name">${f.name}</div>
           <div class="food-area">📍 ${f.area}</div>
+          ${f.address ? `<div class="addr">${f.address}</div>` : ''}
           <div class="food-price">${f.price}</div>
           <div class="food-note">${f.note}</div>
-          ${f.url ? `<a href="${f.url}" target="_blank" class="food-link">查看地图 →</a>` : ''}
+          <a href="${f.mapUrl || H.mapUrl(f.lat, f.lng, f.name)}" target="_blank" class="map-btn">🗺️ Google Maps</a>
         </div>
       `).join('');
     foodArea.appendChild(grid);
@@ -530,7 +607,7 @@
   });
   if (bounds.length) map.fitBounds(bounds, { padding: [40,40] });
 
-  // Tips
+  // Tips — 支持 link + address
   const tg = document.getElementById('tips-grid');
   D.tips.forEach(t => {
     const div = document.createElement('div');
@@ -539,9 +616,40 @@
       <div class="tip-icon">${t.icon}</div>
       <div class="tip-title">${t.title}</div>
       <div class="tip-text">${t.text}</div>
+      ${(t.link || t.address) ? `<div class="tip-extra">
+        ${t.link ? `<a href="${t.link}" target="_blank">${t.linkText || '官方'} →</a>` : ''}
+        ${t.address ? `<span class="addr">📍 ${t.address}</span>` : ''}
+      </div>` : ''}
     `;
     tg.appendChild(div);
   });
+
+  // 迪士尼海洋专题
+  const dg = document.getElementById('disney-guide');
+  if (dg && D.disneySeaGuide) {
+    const G = D.disneySeaGuide;
+    dg.innerHTML = `
+      <div class="disney-head">
+        <h3>${G.title}</h3>
+        <div class="sub">${G.subtitle}</div>
+        <div class="intro">${G.intro}</div>
+      </div>
+      ${G.sections.map(s => {
+        const isLina = s.title.includes('玲娜贝儿');
+        const inner = `<div class="disney-grid">
+          ${s.items.map(it => `<div class="t">${it.time}</div><div class="w"><b>${it.what}</b>${it.note ? `<small>${it.note}</small>` : ''}</div>`).join('')}
+        </div>`;
+        return isLina ? `<div class="disney-highlight">
+          <span class="label">🎀 LIMITED · 限定</span>
+          <h4>${s.title}</h4>
+          ${inner}
+        </div>` : `<div class="disney-section">
+          <div class="disney-section-head"><span class="ico">${s.icon}</span><h4>${s.title}</h4></div>
+          ${inner}
+        </div>`;
+      }).join('')}
+    `;
+  }
 </script>
 </body>
 </html>

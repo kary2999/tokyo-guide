@@ -1,18 +1,52 @@
-// 春节东京 9 天攻略数据
-// image: 网络图(Unsplash CDN, 加载失败回落到渐变)
-// lat/lng: 用于 Leaflet 地图
+// 春节东京 9 天攻略数据 · v2
+// 特性:
+//   1. 日期永远从明天开始(动态计算)
+//   2. 每家店都有 Google Maps 坐标 + 链接
+//   3. Tips 支持 link + address
+//   4. 迪士尼海洋专项穷游攻略 + 玲娜贝儿提示
+
+// 工具函数 — 动态计算 9 天日期(明天开始)
+window.GUIDE_HELPERS = {
+  // 返回 9 天的 Date 对象数组,Day 1 = 明天
+  tripDates() {
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    return Array.from({length: 9}, (_, i) => {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      return d;
+    });
+  },
+  fmt(d) {
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${m}.${day}`;
+  },
+  fmtFull(d) {
+    return `${d.getFullYear()}.${this.fmt(d)}`;
+  },
+  weekday(d) {
+    return ['周日','周一','周二','周三','周四','周五','周六'][d.getDay()];
+  },
+  // Google Maps URL 生成器
+  mapUrl(lat, lng, name) {
+    if (name) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
+    return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  }
+};
+
 window.GUIDE_DATA = {
   meta: {
     title: "春节东京 9 日攻略",
     subtitle: "Tokyo Spring Festival Travel Guide",
-    dateRange: "2024.02.09 — 2024.02.17",
     travelers: "2 人 / 9 天 8 晚"
+    // dateRange 由 helpers.tripDates() 动态生成
   },
 
-  // 9 天行程
+  // 9 天行程 — date 字段移除,日期由 idx + helpers 动态计算
   days: [
     {
-      idx: 1, date: "02.09", lunar: "除夕", title: "大阪 USJ 暖场", emoji: "🎢",
+      idx: 1, lunar: "Day 1", title: "大阪 USJ 暖场", emoji: "🎢",
       city: "大阪",
       blocks: [
         { time: "08:00", tag: "开园", text: "8:00–8:15 开园,9 点前直奔玛丽奥园区。Single Rider 单人通道排队不需坐一起。" },
@@ -21,7 +55,7 @@ window.GUIDE_DATA = {
       ]
     },
     {
-      idx: 2, date: "02.10", lunar: "初一", title: "京都 / 大阪缓冲", emoji: "⛩️",
+      idx: 2, lunar: "Day 2", title: "京都 / 大阪缓冲", emoji: "⛩️",
       city: "京都",
       blocks: [
         { time: "全天", tag: "随逛", text: "八坂神社、通天阁、和歌山,看体力随机选择。酒店需要抽玛丽奥联动主题房。" },
@@ -29,7 +63,7 @@ window.GUIDE_DATA = {
       ]
     },
     {
-      idx: 3, date: "02.11", lunar: "初二", title: "大阪 → 收行李日", emoji: "🧳",
+      idx: 3, lunar: "Day 3", title: "大阪 → 收行李日", emoji: "🧳",
       city: "大阪",
       blocks: [
         { time: "—", tag: "缓冲", text: "整理行李,留出余量。下午到附近商场补购。" },
@@ -37,7 +71,7 @@ window.GUIDE_DATA = {
       ]
     },
     {
-      idx: 4, date: "02.12", lunar: "初三", title: "新干线初到东京", emoji: "🚄",
+      idx: 4, lunar: "Day 4", title: "新干线初到东京", emoji: "🚄",
       city: "大阪 → 东京",
       blocks: [
         { time: "07:00", tag: "出发", text: "最晚 7:00 出门,长居坐车 1 小时到新大阪。¥340" },
@@ -48,7 +82,7 @@ window.GUIDE_DATA = {
       ]
     },
     {
-      idx: 5, date: "02.13", lunar: "初四", title: "迪士尼海洋(全天)", emoji: "🐚",
+      idx: 5, lunar: "Day 5 ⭐", title: "迪士尼海洋(全天)", emoji: "🐚",
       city: "舞滨",
       blocks: [
         { time: "05:51", tag: "交通", text: "京叶线 → 东京站 5:51。¥230" },
@@ -61,11 +95,11 @@ window.GUIDE_DATA = {
         { time: "18:35", tag: "演出", text: "动感大乐团。" },
         { time: "19:20", tag: "演出", text: "梦之海。" },
         { time: "20:30", tag: "压轴", text: "烟花秀。" },
-        { time: "票价", tag: "¥", text: "门票 ¥8,400 / DPA 单项另购。" }
+        { time: "票价", tag: "¥", text: "门票 ¥8,400 / DPA 单项另购。详细攻略见下方专题。" }
       ]
     },
     {
-      idx: 6, date: "02.14", lunar: "初五", title: "富士山一日", emoji: "🗻",
+      idx: 6, lunar: "Day 6", title: "富士山一日", emoji: "🗻",
       city: "富士急 / 河口湖",
       blocks: [
         { time: "06:00", tag: "出发", text: "八丁堀 → 东京站(京叶线) → 富士急乐园(JR 巴士关东)。¥2,210" },
@@ -76,7 +110,7 @@ window.GUIDE_DATA = {
       ]
     },
     {
-      idx: 7, date: "02.15", lunar: "初六", title: "镰仓 + 江之电", emoji: "🚃",
+      idx: 7, lunar: "Day 7", title: "镰仓 + 江之电", emoji: "🚃",
       city: "镰仓",
       blocks: [
         { time: "上午", tag: "海岸", text: "镰仓高校前站(灌篮高手取景平交道)。" },
@@ -86,7 +120,7 @@ window.GUIDE_DATA = {
       ]
     },
     {
-      idx: 8, date: "02.16", lunar: "初七", title: "城里 City Walk", emoji: "🏙️",
+      idx: 8, lunar: "Day 8", title: "城里 City Walk", emoji: "🏙️",
       city: "东京",
       blocks: [
         { time: "上午", tag: "购物", text: "涉谷 SKY / PARCO 极味や 汉堡牛排。" },
@@ -95,7 +129,7 @@ window.GUIDE_DATA = {
       ]
     },
     {
-      idx: 9, date: "02.17", lunar: "初八", title: "回程", emoji: "✈️",
+      idx: 9, lunar: "Day 9", title: "回程", emoji: "✈️",
       city: "东京",
       blocks: [
         { time: "上午", tag: "退房", text: "酒店退房,机场快线/京成 Skyliner 出发。" },
@@ -104,49 +138,49 @@ window.GUIDE_DATA = {
     }
   ],
 
-  // 美食
+  // 美食 — 每家店都有明确的 Google Maps 链接 + 坐标 + 地址
   food: {
     "东京 · 银座 / 京桥": [
-      { name: "銀座楸 ひさぎ", area: "銀座 6-12-16", price: "¥1,100 商业午餐", note: "tabelog 3.76,牡蛎牛排黑咖喱套餐", url: "https://tenjo.tw/ginza-hisagi/", lat: 35.6709, lng: 139.7661 },
-      { name: "京橋松輪", area: "京橋 3-6-1", price: "限定 70 份", note: "tabelog 3.61,午餐限定竹筴鱼定食", url: "https://tenjo.tw/tokyo-food/", lat: 35.6771, lng: 139.7705 }
+      { name: "銀座楸 ひさぎ", area: "銀座", address: "東京都中央區銀座 6-12-16", price: "¥1,100 商业午餐", note: "tabelog 3.76,牡蛎牛排黑咖喱套餐", url: "https://tenjo.tw/ginza-hisagi/", lat: 35.6709, lng: 139.7661, mapUrl: "https://www.google.com/maps/search/?api=1&query=銀座楸+ひさぎ+東京" },
+      { name: "京橋松輪", area: "京橋", address: "東京都中央區京橋 3-6-1", price: "限定 70 份", note: "tabelog 3.61,午餐限定竹筴鱼定食", url: "https://tenjo.tw/tokyo-food/", lat: 35.6771, lng: 139.7705, mapUrl: "https://www.google.com/maps/search/?api=1&query=京橋松輪+京ばし松輪" }
     ],
     "东京 · 上野 / 阿美横町": [
-      { name: "一頭牛 燒肉房家 上野六丁目店", area: "上野 6-6-6", price: "¥980 起 / 套餐 ¥5,110", note: "国产和牛烧肉,一人也能吃", url: "https://maps.app.goo.gl/a34DXyXZrrrgt", lat: 35.7081, lng: 139.7758 },
-      { name: "牛かつあおな", area: "上野 6-5-7", price: "—", note: "国产黑毛和牛炸牛排,十谷米 + 沙拉", lat: 35.7080, lng: 139.7758 },
-      { name: "Domremy Outlet 上野不忍店", area: "上野 2-12-14", price: "¥便宜", note: "外表 NG 甜点 outlet,11:00–21:00", lat: 35.7099, lng: 139.7716 },
-      { name: "沼津港 海將 上野一号店", area: "上野", price: "¥1,700 放题", note: "海鲜放题,阿美横町步行 2 分钟", url: "https://maps.app.goo.gl/Gg6viyTfvj8aQc1k8", lat: 35.7080, lng: 139.7758 }
+      { name: "一頭牛 燒肉房家 上野六丁目店", area: "上野", address: "東京都台東区上野 6-6-6", price: "¥980 起 / 套餐 ¥5,110", note: "国产和牛烧肉,一人也能吃", url: "https://maps.app.goo.gl/a34DXyXZrrrgt", lat: 35.7081, lng: 139.7758, mapUrl: "https://www.google.com/maps/search/?api=1&query=燒肉房家+上野六丁目店" },
+      { name: "牛かつあおな", area: "上野", address: "東京都台東区上野 6-5-7", price: "¥1,300 套餐", note: "国产黑毛和牛炸牛排,十谷米 + 沙拉", lat: 35.7080, lng: 139.7758, mapUrl: "https://www.google.com/maps/search/?api=1&query=牛かつあおな+上野" },
+      { name: "Domremy Outlet 上野不忍店", area: "上野", address: "東京都台東区上野 2-12-14", price: "¥便宜", note: "外表 NG 甜点 outlet,11:00–21:00", lat: 35.7099, lng: 139.7716, mapUrl: "https://www.google.com/maps/search/?api=1&query=Domremy+Outlet+上野不忍店" },
+      { name: "沼津港 海將 上野一号店", area: "阿美横町", address: "東京都台東区上野 4-9-13", price: "¥1,700 放题", note: "海鲜放题,阿美横町步行 2 分钟", url: "https://maps.app.goo.gl/Gg6viyTfvj8aQc1k8", lat: 35.7080, lng: 139.7758, mapUrl: "https://www.google.com/maps/search/?api=1&query=沼津港+海將+上野" }
     ],
     "东京 · 新宿": [
-      { name: "泰然 TAIZEN", area: "新宿 1-23-11", price: "¥1,000 限量", note: "tabelog 3.69,极品比内地鸡亲子丼", lat: 35.6906, lng: 139.7065 },
-      { name: "FISH (フィッシュ)", area: "西新宿 7-5-6", price: "—", note: "tabelog 3.58,印度咖喱三拼", lat: 35.6936, lng: 139.6918 },
-      { name: "AFURI 辛红 新宿 SUBNADE", area: "新宿", price: "—", note: "爆辣拉面", url: "https://maps.app.goo.gl/cty18uxnJ2QM2ybn7", lat: 35.6914, lng: 139.7044 }
+      { name: "泰然 TAIZEN", area: "新宿", address: "東京都新宿区新宿 1-23-11", price: "¥1,000 限量", note: "tabelog 3.69,极品比内地鸡亲子丼", lat: 35.6906, lng: 139.7065, mapUrl: "https://www.google.com/maps/search/?api=1&query=泰然+TAIZEN+新宿" },
+      { name: "FISH (フィッシュ)", area: "西新宿", address: "東京都新宿区西新宿 7-5-6", price: "¥1,200", note: "tabelog 3.58,印度咖喱三拼", lat: 35.6936, lng: 139.6918, mapUrl: "https://www.google.com/maps/search/?api=1&query=FISH+フィッシュ+西新宿" },
+      { name: "AFURI 辛红 新宿 SUBNADE", area: "新宿", address: "新宿区歌舞伎町 1-2-2 SUBNADE B1", price: "¥1,200", note: "爆辣拉面", url: "https://maps.app.goo.gl/cty18uxnJ2QM2ybn7", lat: 35.6914, lng: 139.7044, mapUrl: "https://www.google.com/maps/search/?api=1&query=AFURI+辛紅+新宿+SUBNADE" }
     ],
     "东京 · 浅草 / 涉谷": [
-      { name: "Pelican Cafe", area: "浅草 寿 3-9-11", price: "—", note: "77 年老店传奇吐司,9:00 开门已排队", lat: 35.7141, lng: 139.7894 },
-      { name: "壽々喜園 × ななや 浅草本店", area: "浅草 3-4-3", price: "—", note: "世界最浓抹茶冰淇淋,7 种浓度可选", lat: 35.7150, lng: 139.7934 },
-      { name: "極味や 渋谷 PARCO 店", area: "涉谷 PARCO B1", price: "—", note: "汉堡牛排招牌,自烤铁板", url: "https://maps.app.goo.gl/bcXhx828J3VQn", lat: 35.6608, lng: 139.6989 },
-      { name: "Red Rock 原宿店", area: "神宫前 3-25-12 B1", price: "—", note: "tabelog 3.51,神户牛排丼", lat: 35.6701, lng: 139.7077 }
+      { name: "Pelican Cafe", area: "浅草", address: "東京都台東区寿 3-9-11 1F", price: "¥600–1,200", note: "77 年老店传奇吐司,9:00 开门已排队", lat: 35.7141, lng: 139.7894, mapUrl: "https://www.google.com/maps/search/?api=1&query=Pelican+Cafe+浅草" },
+      { name: "壽々喜園 × ななや 浅草本店", area: "浅草", address: "東京都台東区浅草 3-4-3", price: "¥560 起", note: "世界最浓抹茶冰淇淋,7 种浓度可选", lat: 35.7150, lng: 139.7934, mapUrl: "https://www.google.com/maps/search/?api=1&query=壽々喜園+ななや+浅草本店" },
+      { name: "極味や 渋谷 PARCO 店", area: "涉谷", address: "東京都渋谷区宇田川町 15-1 渋谷PARCO B1", price: "¥1,500–2,500", note: "汉堡牛排招牌,自烤铁板", url: "https://maps.app.goo.gl/bcXhx828J3VQn", lat: 35.6608, lng: 139.6989, mapUrl: "https://www.google.com/maps/search/?api=1&query=極味や+渋谷PARCO" },
+      { name: "Red Rock 原宿店", area: "原宿", address: "東京都渋谷区神宮前 3-25-12 フジビル B1F", price: "¥1,200–1,500", note: "tabelog 3.51,神户牛排丼", lat: 35.6701, lng: 139.7077, mapUrl: "https://www.google.com/maps/search/?api=1&query=Red+Rock+原宿店" }
     ],
     "东京 · 人形町 / 麻布": [
-      { name: "柳屋鯛魚燒", area: "人形町 2-11-3", price: "—", note: "东京三大鯛魚燒之一,12:30–18:00 周日休", lat: 35.6857, lng: 139.7818 },
-      { name: "麻布十番 浪花家總本店", area: "麻布十番 1-8-14", price: "—", note: "东京三大鯛魚燒之一,作者私心最推", lat: 35.6555, lng: 139.7359 },
-      { name: "若葉鯛魚燒", area: "新宿 若葉 1-10", price: "—", note: "东京三大鯛魚燒,有内用座位", lat: 35.6849, lng: 139.7232 }
+      { name: "柳屋鯛魚燒", area: "人形町", address: "東京都中央区日本橋人形町 2-11-3", price: "¥200 / 个", note: "东京三大鯛魚燒之一,12:30–18:00 周日休", lat: 35.6857, lng: 139.7818, mapUrl: "https://www.google.com/maps/search/?api=1&query=柳屋+人形町" },
+      { name: "麻布十番 浪花家總本店", area: "麻布十番", address: "東京都港区麻布十番 1-8-14", price: "¥200 / 个", note: "东京三大鯛魚燒之一,作者私心最推", lat: 35.6555, lng: 139.7359, mapUrl: "https://www.google.com/maps/search/?api=1&query=浪花家総本店+麻布十番" },
+      { name: "若葉鯛魚燒", area: "新宿", address: "東京都新宿区若葉 1-10", price: "¥200 / 个", note: "东京三大鯛魚燒,有内用座位", lat: 35.6849, lng: 139.7232, mapUrl: "https://www.google.com/maps/search/?api=1&query=たいやき+わかば+四ツ谷" }
     ],
     "大阪 · 心斋桥 / 美国村": [
-      { name: "わなか 道頓堀店", area: "道顿堀", price: "—", note: "章鱼烧名店", url: "https://maps.app.goo.gl/E8NtDNyfLCNoF", lat: 34.6688, lng: 135.5026 },
-      { name: "元祖アイスドッグ", area: "美国村", price: "—", note: "冰狗 ICE DOG", url: "https://maps.app.goo.gl/Xon9EZNVme3Rx", lat: 34.6739, lng: 135.4970 },
-      { name: "牛たん炭火焼 吉次 鰻谷店", area: "心斋桥 16:00–02:00", price: "—", note: "深夜烧牛舌", url: "https://maps.app.goo.gl/vLsZFsSfAGS7N", lat: 34.6770, lng: 135.5008 },
-      { name: "一斗 東心斎橋店本館", area: "心斋桥", price: "2 人 ¥10,000+", note: "需提前预约", url: "https://maps.app.goo.gl/aWkwUimnjF7qU", lat: 34.6750, lng: 135.4998 }
+      { name: "わなか 道頓堀店", area: "道顿堀", address: "大阪府大阪市中央区難波 1-7-9", price: "¥600 / 8 个", note: "章鱼烧名店", url: "https://maps.app.goo.gl/E8NtDNyfLCNoF", lat: 34.6688, lng: 135.5026, mapUrl: "https://www.google.com/maps/search/?api=1&query=わなか+道頓堀店" },
+      { name: "元祖アイスドッグ", area: "美国村", address: "大阪府大阪市中央区西心斎橋 1-7-11", price: "¥520", note: "冰狗 ICE DOG", url: "https://maps.app.goo.gl/Xon9EZNVme3Rx", lat: 34.6739, lng: 135.4970, mapUrl: "https://www.google.com/maps/search/?api=1&query=元祖アイスドッグ+美国村" },
+      { name: "牛たん炭火焼 吉次 鰻谷店", area: "心斋桥", address: "大阪府大阪市中央区東心斎橋 1-15-19", price: "¥3,000+", note: "深夜烧牛舌,16:00–02:00", url: "https://maps.app.goo.gl/vLsZFsSfAGS7N", lat: 34.6770, lng: 135.5008, mapUrl: "https://www.google.com/maps/search/?api=1&query=牛たん炭火焼+吉次+鰻谷店" },
+      { name: "一斗 東心斎橋店本館", area: "心斋桥", address: "大阪府大阪市中央区東心斎橋 1-17-21", price: "2 人 ¥10,000+", note: "需提前预约", url: "https://maps.app.goo.gl/aWkwUimnjF7qU", lat: 34.6750, lng: 135.4998, mapUrl: "https://www.google.com/maps/search/?api=1&query=一斗+東心斎橋店本館" }
     ],
     "大阪 · 新世界 / 天满": [
-      { name: "串かつだるま 新世界総本店", area: "新世界通天阁", price: "¥1,800 / 11 串", note: "元祖炸串、鸡软骨、年糕", url: "https://maps.app.goo.gl/A6XS5jRcYhn3K", lat: 34.6526, lng: 135.5063 },
-      { name: "和牛タン次郎 大阪天満店", area: "天满", price: "—", note: "牛舌专门", url: "https://maps.app.goo.gl/Sdk1xYRX5LTQS", lat: 34.7028, lng: 135.5152 },
-      { name: "西洋茶館", area: "天满", price: "布丁 ¥950", note: "复古洋风茶屋", url: "https://maps.app.goo.gl/QLnYCC9ygndX8", lat: 34.7017, lng: 135.5114 },
-      { name: "千鳥屋宗家 天滿店", area: "天满", price: "—", note: "甜酱油团子、千鸟馒头", url: "https://maps.app.goo.gl/sco9Hw4QH9hhM", lat: 34.7039, lng: 135.5135 }
+      { name: "串かつだるま 新世界総本店", area: "新世界", address: "大阪府大阪市浪速区恵美須東 2-3-9", price: "¥1,800 / 11 串", note: "元祖炸串、鸡软骨、年糕", url: "https://maps.app.goo.gl/A6XS5jRcYhn3K", lat: 34.6526, lng: 135.5063, mapUrl: "https://www.google.com/maps/search/?api=1&query=串かつだるま+新世界総本店" },
+      { name: "和牛タン次郎 大阪天満店", area: "天满", address: "大阪府大阪市北区天神橋 3-1-23", price: "¥2,500+", note: "牛舌专门", url: "https://maps.app.goo.gl/Sdk1xYRX5LTQS", lat: 34.7028, lng: 135.5152, mapUrl: "https://www.google.com/maps/search/?api=1&query=和牛タン次郎+大阪天満店" },
+      { name: "西洋茶館", area: "天满", address: "大阪府大阪市北区天神橋 4-6-14", price: "布丁 ¥950", note: "复古洋风茶屋", url: "https://maps.app.goo.gl/QLnYCC9ygndX8", lat: 34.7017, lng: 135.5114, mapUrl: "https://www.google.com/maps/search/?api=1&query=西洋茶館+天満" },
+      { name: "千鳥屋宗家 天滿店", area: "天满", address: "大阪府大阪市北区天神橋 3-2-8", price: "¥200 起", note: "甜酱油团子、千鸟馒头", url: "https://maps.app.goo.gl/sco9Hw4QH9hhM", lat: 34.7039, lng: 135.5135, mapUrl: "https://www.google.com/maps/search/?api=1&query=千鳥屋宗家+天滿店" }
     ]
   },
 
-  // 景点 - 加 image / lat / lng
+  // 景点
   attractions: [
     {
       name: "东京迪士尼海洋",
@@ -154,10 +188,17 @@ window.GUIDE_DATA = {
       hours: "9:00–21:00",
       price: "¥8,400 – 9,400",
       desc: "8:30 甚至 8:20 就开门;度假村酒店住客可早入园 15 分钟。入园即抢入场卡,APP 提前下载。重点项目:翱翔梦幻奇航、地心探险、印第安纳琼斯、愤怒双神(过山车)、辛巴达传奇之旅、神灯剧场。",
-      tips: ["橘色项目用入场卡、红色项目用 DPA","下午前往美国海滨仅浏览,不交通","9 点前直奔人气区,刚入园人最多","水上花车 11:30 / 14:05 / 16:05"],
+      tips: [
+        "🎀 玲娜贝儿(LinaBell)全球只在上海迪士尼 + 东京迪士尼海洋有售,其他迪士尼乐园都买不到 — 必收!",
+        "橘色项目用入场卡、红色项目用 DPA",
+        "下午前往美国海滨仅浏览,不交通",
+        "9 点前直奔人气区,刚入园人最多",
+        "水上花车 11:30 / 14:05 / 16:05"
+      ],
       url: "https://www.tokyodisneyresort.jp/tc/tdr/calendar.html",
       image: "https://images.unsplash.com/photo-1624601573012-efb68931cc8f?w=800&q=80&auto=format&fit=crop",
       lat: 35.6267, lng: 139.8851,
+      mapUrl: "https://www.google.com/maps/search/?api=1&query=東京ディズニーシー",
       gradient: "linear-gradient(135deg,#5e9dd6,#a8d4e9)"
     },
     {
@@ -170,6 +211,7 @@ window.GUIDE_DATA = {
       url: "https://www.shibuya-scramble-square.com/sky/ticket/",
       image: "https://images.unsplash.com/photo-1542931287-023b922fa89b?w=800&q=80&auto=format&fit=crop",
       lat: 35.6585, lng: 139.7016,
+      mapUrl: "https://www.google.com/maps/search/?api=1&query=Shibuya+Sky",
       gradient: "linear-gradient(135deg,#1f2c4a,#4a6da7)"
     },
     {
@@ -182,6 +224,7 @@ window.GUIDE_DATA = {
       url: "https://smallworlds.jp/en/",
       image: "https://images.unsplash.com/photo-1555169062-013468b47731?w=800&q=80&auto=format&fit=crop",
       lat: 35.6303, lng: 139.7867,
+      mapUrl: "https://www.google.com/maps/search/?api=1&query=Small+Worlds+TOKYO",
       gradient: "linear-gradient(135deg,#7e57c2,#b39ddb)"
     },
     {
@@ -193,6 +236,7 @@ window.GUIDE_DATA = {
       tips: ["御殿场地铁站距离奥莱 2.8 公里","返程 19:45 末班需注意"],
       image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&q=80&auto=format&fit=crop",
       lat: 35.3115, lng: 138.9176,
+      mapUrl: "https://www.google.com/maps/search/?api=1&query=御殿場プレミアム・アウトレット",
       gradient: "linear-gradient(135deg,#d4a574,#f4e4c1)"
     },
     {
@@ -205,6 +249,7 @@ window.GUIDE_DATA = {
       url: "https://www.fujiq.jp/en/ticket/attraction.html",
       image: "https://images.unsplash.com/photo-1578637387939-43c525550085?w=800&q=80&auto=format&fit=crop",
       lat: 35.4877, lng: 138.7821,
+      mapUrl: "https://www.google.com/maps/search/?api=1&query=富士急ハイランド",
       gradient: "linear-gradient(135deg,#82b1ff,#f8bbd0)"
     },
     {
@@ -217,6 +262,7 @@ window.GUIDE_DATA = {
       url: "https://www.tokyotower.co.jp/cn/price/",
       image: "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=800&q=80&auto=format&fit=crop",
       lat: 35.6586, lng: 139.7454,
+      mapUrl: "https://www.google.com/maps/search/?api=1&query=東京タワー",
       gradient: "linear-gradient(135deg,#ff6f61,#ffb199)"
     },
     {
@@ -226,9 +272,10 @@ window.GUIDE_DATA = {
       price: "¥3,100",
       desc: "445–450 楼天望回廊为最高 451.2m。340–350 楼天望甲板可在手扶梯间自由移动,345 楼有空中餐厅与玻璃地板。",
       tips: ["距离浅草步行 20 分钟","Sky Restaurant 需正装"],
-      url: "https://maps.app.goo.gl/6kw39d31uaNevPUD7",
+      url: "https://www.tokyo-skytree.jp/cn_t/",
       image: "https://images.unsplash.com/photo-1554797589-7241bb691973?w=800&q=80&auto=format&fit=crop",
       lat: 35.7100, lng: 139.8107,
+      mapUrl: "https://www.google.com/maps/search/?api=1&query=東京スカイツリー",
       gradient: "linear-gradient(135deg,#42a5f5,#90caf9)"
     },
     {
@@ -238,8 +285,10 @@ window.GUIDE_DATA = {
       price: "免费",
       desc: "雷门、仲见世通、浅草寺一条龙。周边四条线路:东京メトロ银座线、都营浅草线、东武铁道、つくばエクスプレス。",
       tips: ["可衔接晴空塔 / 隅田川","逛吃推荐花月堂菠萝包"],
+      url: "https://www.senso-ji.jp/",
       image: "https://images.unsplash.com/photo-1583400845999-ec56cc9c98ae?w=800&q=80&auto=format&fit=crop",
       lat: 35.7148, lng: 139.7967,
+      mapUrl: "https://www.google.com/maps/search/?api=1&query=浅草寺",
       gradient: "linear-gradient(135deg,#c62828,#ffab91)"
     },
     {
@@ -251,6 +300,7 @@ window.GUIDE_DATA = {
       tips: ["拍照高峰人多,礼让本地居民","江之电限定饭团车站"],
       image: "https://images.unsplash.com/photo-1601736015921-eaf1b46a7eea?w=800&q=80&auto=format&fit=crop",
       lat: 35.3072, lng: 139.5022,
+      mapUrl: "https://www.google.com/maps/search/?api=1&query=鎌倉高校前駅",
       gradient: "linear-gradient(135deg,#26a69a,#80cbc4)"
     },
     {
@@ -262,6 +312,7 @@ window.GUIDE_DATA = {
       tips: ["最后开放阶段,先到先抢"],
       image: "https://images.unsplash.com/photo-1635436891088-1a0f1f5b6dfd?w=800&q=80&auto=format&fit=crop",
       lat: 35.4422, lng: 139.6512,
+      mapUrl: "https://www.google.com/maps/search/?api=1&query=GUNDAM+FACTORY+YOKOHAMA",
       gradient: "linear-gradient(135deg,#37474f,#78909c)"
     },
     {
@@ -273,6 +324,7 @@ window.GUIDE_DATA = {
       tips: ["建议和晴空塔合并安排"],
       image: "https://images.unsplash.com/photo-1580674684081-7617fbf3d745?w=800&q=80&auto=format&fit=crop",
       lat: 35.7100, lng: 139.8107,
+      mapUrl: "https://www.google.com/maps/search/?api=1&query=すみだ水族館",
       gradient: "linear-gradient(135deg,#0277bd,#4fc3f7)"
     },
     {
@@ -282,8 +334,10 @@ window.GUIDE_DATA = {
       price: "¥3,773",
       desc: "宫崎骏亲自设计,需提前一个月抢票,每月 10 号放下个月票,可上网找代抢(需日本 IP)。",
       tips: ["三鹰站南口步行 15 分钟","或南口 9 号巴士站搭巴士 ¥210"],
+      url: "https://www.ghibli-museum.jp/",
       image: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80&auto=format&fit=crop",
       lat: 35.6962, lng: 139.5703,
+      mapUrl: "https://www.google.com/maps/search/?api=1&query=三鷹の森ジブリ美術館",
       gradient: "linear-gradient(135deg,#558b2f,#aed581)"
     },
     {
@@ -295,11 +349,12 @@ window.GUIDE_DATA = {
       tips: ["和镰仓一日游可串"],
       image: "https://images.unsplash.com/photo-1540126034813-121bf29033d2?w=800&q=80&auto=format&fit=crop",
       lat: 35.4427, lng: 139.6463,
+      mapUrl: "https://www.google.com/maps/search/?api=1&query=横浜中華街",
       gradient: "linear-gradient(135deg,#d32f2f,#ffcdd2)"
     }
   ],
 
-  // 个人相册 (从 numbers 文件提取的截图样本)
+  // 个人相册
   myPhotos: [
     { src: "img/my-01.png", caption: "本人现场记录" },
     { src: "img/my-02.png", caption: "本人现场记录" },
@@ -309,17 +364,139 @@ window.GUIDE_DATA = {
     { src: "img/my-06.png", caption: "本人现场记录" }
   ],
 
-  // 攻略 Tips
+  // 攻略 Tips — 支持 link + address
   tips: [
-    { icon: "🎫", title: "迪士尼海洋 8 字心法", text: "8:20 入场 → 8:30 抢卡 → 9:00 首发热门 → 11:30 花车 → 12:00 红绿 DPA → 18:35 大乐团 → 19:20 梦之海 → 20:30 烟花。" },
-    { icon: "🚄", title: "新干线提前买", text: "新大阪 → 东京 ¥32,000 / 4 小时,飞猪/官网 14 天前票稳。Suica 余额提前充足。" },
-    { icon: "📱", title: "迪士尼 APP", text: "提前下载 Tokyo Disney APP,定位、抢卡、DPA、菜单、表演时刻全在里面。日区 Apple ID 不可少。" },
-    { icon: "🌧️", title: "海洋装备", text: "椅子 / 防潮垫 / 伞 / 水杯 / 帽子 / 雨衣 / 暖宝宝。冬季海风大,加一件防风外套。" },
-    { icon: "🍣", title: "Tabelog 选店", text: "tabelog ≥ 3.5 已是良好,3.6+ 名店,3.7+ 稳预约。营业时间 LO 表示最后点单。" },
-    { icon: "🎟️", title: "晴空 vs 铁塔", text: "网友更推东京铁塔(夜景广)。Sky Restaurant 345F 需正装(商务装才让进)。" },
-    { icon: "🚌", title: "御殿场奥莱", text: "新宿站巴士 4 层直达,秋叶原 / 横滨也有班次。返程接镰仓走横须贺线最顺。" },
-    { icon: "🗻", title: "富士急 + 河口湖", text: "富士急乐园门票免费、项目单点付费。月江寺/日川时计店是富士山经典街拍机位。" },
-    { icon: "🎨", title: "吉卜力抢票", text: "每月 10 号 10:00 放下个月票,L-Tike 系统,需日本 IP。三鹰站南口 9 号巴士 ¥210。" },
-    { icon: "💴", title: "现金 vs 刷卡", text: "迪士尼、便利店、JR 自动售票普及刷卡;鯛魚燒老店、神社御守等多收现金。建议留 ¥10,000 现金/人。" }
-  ]
+    {
+      icon: "🎫", title: "迪士尼海洋 8 字心法",
+      text: "8:20 入场 → 8:30 抢卡 → 9:00 首发热门 → 11:30 花车 → 12:00 红绿 DPA → 18:35 大乐团 → 19:20 梦之海 → 20:30 烟花。",
+      link: "https://www.tokyodisneyresort.jp/tc/tds/",
+      linkText: "Disney 官方"
+    },
+    {
+      icon: "🎀", title: "玲娜贝儿(LinaBell)限定",
+      text: "全球迪士尼乐园中,只有上海迪士尼 + 东京迪士尼海洋出售玲娜贝儿周边,其他乐园(东京迪士尼乐园、香港、巴黎、奥兰多、加州)都买不到。东京 DisneySea 入园直奔美人鱼礁湖城/失落河三角洲附近的玩具店。"
+    },
+    {
+      icon: "🚄", title: "新干线提前买",
+      text: "新大阪 → 东京 ¥32,000 / 4 小时,飞猪/官网 14 天前票稳。Suica 余额提前充足。",
+      link: "https://smart-ex.jp/en/",
+      linkText: "Smart EX 官网"
+    },
+    {
+      icon: "📱", title: "迪士尼 APP",
+      text: "提前下载 Tokyo Disney APP,定位、抢卡、DPA、菜单、表演时刻全在里面。日区 Apple ID 不可少。",
+      link: "https://www.tokyodisneyresort.jp/en/app/",
+      linkText: "下载 APP"
+    },
+    {
+      icon: "🌧️", title: "海洋装备",
+      text: "椅子 / 防潮垫 / 伞 / 水杯 / 帽子 / 雨衣 / 暖宝宝。冬季海风大,加一件防风外套。"
+    },
+    {
+      icon: "🍣", title: "Tabelog 选店",
+      text: "tabelog ≥ 3.5 已是良好,3.6+ 名店,3.7+ 稳预约。营业时间 LO 表示最后点单。",
+      link: "https://tabelog.com/",
+      linkText: "Tabelog 官网"
+    },
+    {
+      icon: "🎟️", title: "晴空 vs 铁塔",
+      text: "网友更推东京铁塔(夜景广)。Sky Restaurant 345F 需正装(商务装才让进)。"
+    },
+    {
+      icon: "🚌", title: "御殿场奥莱",
+      text: "新宿站巴士 4 层直达,秋叶原 / 横滨也有班次。返程接镰仓走横须贺线最顺。",
+      address: "新宿站新南口巴士总站 4 楼"
+    },
+    {
+      icon: "🗻", title: "富士急 + 河口湖",
+      text: "富士急乐园门票免费、项目单点付费。月江寺/日川时计店是富士山经典街拍机位。",
+      link: "https://www.fujiq.jp/en/",
+      linkText: "富士急官网"
+    },
+    {
+      icon: "🎨", title: "吉卜力抢票",
+      text: "每月 10 号 10:00 放下个月票,L-Tike 系统,需日本 IP。三鹰站南口 9 号巴士 ¥210。",
+      link: "https://l-tike.com/ghibli/",
+      linkText: "L-Tike 抢票"
+    },
+    {
+      icon: "💴", title: "现金 vs 刷卡",
+      text: "迪士尼、便利店、JR 自动售票普及刷卡;鯛魚燒老店、神社御守等多收现金。建议留 ¥10,000 现金/人。"
+    }
+  ],
+
+  // ⭐ 迪士尼海洋穷游攻略 · 详细图块
+  disneySeaGuide: {
+    title: "迪士尼海洋穷游攻略",
+    subtitle: "8:20 入场到 21:00 烟花的全天路线",
+    intro: "9 天行程里最贵也最值的一天。门票 ¥8,400 起、DPA 单项 ¥1,500–2,500、餐饮 ¥3,000+,但用对方法可以从'人均 ¥1,800/小时'变成'¥800/小时'。下面是经过实战验证的 5 个模块。",
+    sections: [
+      {
+        icon: "⏰", title: "黄金时刻表 · 时间就是钱",
+        items: [
+          { time: "05:51", what: "京叶线坐到东京站", note: "第一班车,¥230" },
+          { time: "06:07", what: "东京站 → 舞滨站", note: "京叶线 11 分钟" },
+          { time: "06:25", what: "步行 15 分钟到正门", note: "出站后跟人流即可" },
+          { time: "08:20", what: "实际开门(官方 8:30)", note: "度假村酒店住客再早 15 min" },
+          { time: "08:30", what: "立刻抢入场卡 + APP DPA", note: "翱翔梦幻奇航、美人鱼、印第安纳琼斯优先" },
+          { time: "09:00", what: "首发人气项目", note: "刚入园人最多,直冲入口" },
+          { time: "11:30", what: "水上花车第 1 场", note: "找好位子提前 30 min" },
+          { time: "12:00", what: "红色项目 DPA、橘色入场卡", note: "开抢下午的约" },
+          { time: "14:05", what: "水上花车第 2 场", note: "也可改逛美国海滨" },
+          { time: "16:05", what: "水上花车第 3 场", note: "" },
+          { time: "18:35", what: "动感大乐团", note: "码头湖畔的 LIVE" },
+          { time: "19:20", what: "梦之海", note: "夜间灯光秀" },
+          { time: "20:30", what: "压轴烟花秀", note: "日落后最佳位置:火山附近" }
+        ]
+      },
+      {
+        icon: "🎢", title: "项目优先级 · 排队经济学",
+        items: [
+          { time: "S 级", what: "翱翔梦幻奇航(Soaring)", note: "5D 飞行模拟,排队 90+ 分钟,DPA 必买" },
+          { time: "S 级", what: "海底两万里", note: "美人鱼礁湖,排队 60+ 分钟" },
+          { time: "A 级", what: "印第安纳琼斯·愤怒双神", note: "过山车,1 分半,排队 45 min" },
+          { time: "A 级", what: "地心探险之旅", note: "矿车型轨道,刺激" },
+          { time: "B 级", what: "辛巴达传奇之旅", note: "黑暗中的小船,排队短" },
+          { time: "B 级", what: "神灯剧场", note: "阿拉伯风,室内剧场" },
+          { time: "C 级", what: "尼莫与他的好朋友海底寻", note: "亲子向" },
+          { time: "C 级", what: "美人鱼礁湖室内场馆", note: "下雨天首选" }
+        ]
+      },
+      {
+        icon: "🎀", title: "玲娜贝儿(LinaBell)限定 · 必收清单",
+        items: [
+          { time: "全球只在 2 处有售", what: "上海迪士尼 + 东京迪士尼海洋", note: "其他迪士尼(东京乐园 / 香港 / 巴黎 / 加州 / 奥兰多)都买不到" },
+          { time: "DisneySea 主店", what: "美人鱼礁湖城 Mermaid Treasures", note: "周边、毛绒、文具大集合" },
+          { time: "失落河三角洲", what: "Lost River Outfitters", note: "限定服装 / 帽子 / 包" },
+          { time: "进园后", what: "建议先去抢热门项目卡再买", note: "热门款下午容易售罄" },
+          { time: "现金 + IC", what: "店内支持刷卡 + 现金", note: "Suica / 银联 / Visa 都行" },
+          { time: "尺寸提示", what: "毛绒玩偶 ¥3,500–¥6,500", note: "S 号比上海版略小,价位略低" }
+        ]
+      },
+      {
+        icon: "💴", title: "省钱 & 装备清单",
+        items: [
+          { time: "门票", what: "¥8,400(平日)~ ¥9,400(高峰)", note: "官网/飞猪/Klook 提前买稳" },
+          { time: "DPA", what: "重点项目单买,¥1,500–2,500", note: "翱翔梦幻奇航必买,其他看人流" },
+          { time: "装备", what: "椅子 / 防潮垫 / 伞 / 雨衣 / 帽子", note: "晚场 4–5 小时占位用" },
+          { time: "保暖", what: "防风外套 / 暖宝宝 / 围巾", note: "海风大,夜场 3 度起跳" },
+          { time: "餐饮", what: "园内 ¥1,500–3,000 / 餐", note: "可带轻食 / 在外面吃完进园" },
+          { time: "水", what: "水杯自带,园内饮水机免费", note: "每个洗手间附近都有" },
+          { time: "充电宝", what: "10000 mAh 起", note: "APP 全天高耗电,不带回家空手" },
+          { time: "Apple ID", what: "切日区下载 Tokyo Disney APP", note: "中国区 App Store 没有" }
+        ]
+      },
+      {
+        icon: "🍔", title: "DisneySea 餐饮指南",
+        items: [
+          { time: "Sailing Day Buffet", what: "美式自助餐 ¥3,800/人", note: "美国海滨,座位舒服" },
+          { time: "Cape Cod Cook-Off", what: "Duffy 主题餐厅", note: "亲子向 + 玩偶演出" },
+          { time: "Casbah Food Court", what: "阿拉伯咖喱 ¥1,200", note: "性价比最高" },
+          { time: "Mermaid Lagoon", what: "海洋主题快餐 ¥1,000", note: "室内,不晒不冷" },
+          { time: "Mamma Biscotti's Bakery", what: "披萨 / 三明治 ¥800", note: "排队短" },
+          { time: "外带零食", what: "奶油爆米花桶 ¥2,400", note: "桶可重复装,省后续买零食钱" }
+        ]
+      }
+    ]
+  }
 };

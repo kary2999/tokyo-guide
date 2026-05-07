@@ -430,6 +430,116 @@
     color: var(--pen); font-weight: 700;
   }
   .tip-content p { font-size: .87rem; line-height: 1.6; color: var(--pen-soft); }
+  .tip-extra { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: .4rem; font-size: .8rem; }
+  .tip-extra a {
+    color: var(--blue); text-decoration: none;
+    font-family: "Caveat", cursive; font-size: 1rem;
+    border-bottom: 2px wavy var(--blue);
+  }
+  .tip-extra .addr { color: var(--pen-soft); font-size: .8rem; }
+
+  /* 美食卡片地图按钮 */
+  .sticky-note .map-btn {
+    display: inline-block; margin-top: .4rem;
+    background: var(--pen); color: #fff;
+    padding: .15rem .7rem; border-radius: 4px;
+    font-family: "Patrick Hand", cursive; font-size: .8rem;
+    text-decoration: none;
+  }
+  .sticky-note .addr {
+    font-size: .75rem; color: var(--pen-soft);
+    margin-top: .2rem; line-height: 1.4;
+  }
+
+  /* 迪士尼海洋专题 */
+  .disney-guide {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 6px 6px 0 var(--pen-soft);
+    padding: 1.8rem 1.6rem;
+    position: relative;
+  }
+  .disney-guide::before {
+    content: ""; position: absolute; top: -14px; left: 30px;
+    width: 140px; height: 26px;
+    background: var(--tape-3); transform: rotate(-2deg);
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  }
+  .disney-guide::after {
+    content: ""; position: absolute; top: -14px; right: 30px;
+    width: 140px; height: 26px;
+    background: var(--tape-2); transform: rotate(2deg);
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  }
+  .disney-head { text-align: center; margin-bottom: 1.5rem; padding: 0 1rem; }
+  .disney-head h3 {
+    font-family: "Caveat", cursive; font-size: 2.2rem;
+    color: var(--pen); margin-bottom: .3rem;
+  }
+  .disney-head .sub { font-family: "Shadows Into Light", cursive;
+    color: var(--red); font-size: 1.1rem; margin-bottom: .8rem; }
+  .disney-head .intro {
+    font-family: "Patrick Hand", cursive; font-size: .92rem;
+    color: var(--pen-soft); line-height: 1.7;
+    max-width: 600px; margin: 0 auto;
+  }
+  .disney-section {
+    margin-top: 1.5rem;
+    border-top: 2px dashed var(--pen-soft);
+    padding-top: 1.2rem;
+  }
+  .disney-section-head {
+    display: flex; align-items: center; gap: .6rem;
+    margin-bottom: 1rem;
+  }
+  .disney-section-head .ico {
+    font-size: 1.5rem; line-height: 1;
+  }
+  .disney-section-head h4 {
+    font-family: "Caveat", cursive; font-size: 1.5rem;
+    color: var(--pen); font-weight: 700;
+    background: var(--yellow); padding: .15rem .6rem;
+    transform: rotate(-1deg);
+  }
+  .disney-grid {
+    display: grid; grid-template-columns: 90px 1fr;
+    gap: .4rem 1rem;
+    align-items: start;
+    font-size: .9rem;
+  }
+  .disney-grid .t {
+    font-family: "Caveat", cursive;
+    font-weight: 700; color: var(--red);
+    background: #fffaaf; padding: .2rem .6rem;
+    border-radius: 4px; text-align: center;
+    font-size: 1rem;
+    box-shadow: 1px 1px 0 var(--pen-soft);
+  }
+  .disney-grid .w {
+    font-family: "Patrick Hand", cursive;
+    color: var(--pen);
+    border-bottom: 1px dashed #ddd;
+    padding-bottom: .4rem;
+  }
+  .disney-grid .w b {
+    display: block; font-weight: 500; margin-bottom: .15rem;
+  }
+  .disney-grid .w small {
+    color: var(--pen-soft); font-size: .82rem;
+  }
+  .disney-highlight {
+    background: linear-gradient(120deg, #ffeef5, #fff7c0);
+    border: 2px dashed var(--pink);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+  }
+  .disney-highlight .label {
+    display: inline-block; background: var(--pink); color: #fff;
+    font-family: "Patrick Hand", cursive; font-size: .85rem;
+    padding: .1rem .7rem; border-radius: 999px;
+    margin-bottom: .4rem;
+  }
 
   footer {
     text-align: center; padding: 4rem 1rem;
@@ -469,6 +579,7 @@
   <a href="#days">📔 行程</a>
   <a href="#food">🍣 美食</a>
   <a href="#attractions">📸 景点</a>
+  <a href="#disney">🎢 海洋攻略</a>
   <a href="#photos">📷 相册</a>
   <a href="#tips">✅ Tips</a>
   <a href="gallery.html">🎨 切换风格</a>
@@ -510,6 +621,14 @@
   <div class="polaroid-grid" id="polaroid-grid"></div>
 </section>
 
+<section id="disney">
+  <div class="sec-title">
+    <span class="num">SPECIAL</span>
+    <h2>迪士尼海洋穷游攻略</h2>
+  </div>
+  <div class="disney-guide" id="disney-guide"></div>
+</section>
+
 <section id="photos">
   <div class="sec-title">
     <span class="num">CHAPTER 04</span>
@@ -538,6 +657,10 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
   const D = window.GUIDE_DATA;
+  const H = window.GUIDE_HELPERS;
+  // 动态日期 — Day 1 永远是明天
+  const tripDates = H.tripDates();
+  D.meta.dateRange = `${H.fmtFull(tripDates[0])} — ${H.fmtFull(tripDates[8])}`;
   document.getElementById('date-range').textContent = D.meta.dateRange;
   document.getElementById('travelers').textContent = D.meta.travelers;
 
@@ -546,12 +669,15 @@
   // 行程
   const days = document.getElementById('days-list');
   D.days.forEach((d, i) => {
+    const dateObj = tripDates[i];
+    const dateStr = H.fmt(dateObj);
+    const wd = H.weekday(dateObj);
     const card = document.createElement('div');
     card.className = 'day-page';
     card.innerHTML = `
       <div class="day-head">
         <div>
-          <div class="day-date">DAY ${d.idx} / ${d.date}</div>
+          <div class="day-date">DAY ${d.idx} / ${dateStr} ${wd}</div>
           <h3>${d.title}</h3>
         </div>
         <div class="day-emoji">${d.emoji}</div>
@@ -573,7 +699,7 @@
     days.appendChild(card);
   });
 
-  // 美食
+  // 美食 — 每家都有 Google Maps 按钮
   const foodArea = document.getElementById('food-area');
   Object.entries(D.food).forEach(([area, items]) => {
     const sec = document.createElement('div');
@@ -585,9 +711,10 @@
           <div class="sticky-note">
             <h4>${f.name}</h4>
             <div class="area">📍 ${f.area}</div>
+            ${f.address ? `<div class="addr">${f.address}</div>` : ''}
             <div class="price">${f.price}</div>
             <p>${f.note}</p>
-            ${f.url ? `<a href="${f.url}" target="_blank">→ 看地图</a>` : ''}
+            <a href="${f.mapUrl || H.mapUrl(f.lat, f.lng, f.name)}" target="_blank" class="map-btn">🗺️ Google Maps</a>
           </div>
         `).join('')}
       </div>
@@ -662,7 +789,7 @@
   });
   if (bounds.length) map.fitBounds(bounds, { padding: [40,40] });
 
-  // Tips
+  // Tips — 支持 link + address
   const tl = document.getElementById('tips-list');
   D.tips.forEach(t => {
     const row = document.createElement('div');
@@ -672,10 +799,47 @@
       <div class="tip-content">
         <h4>${t.title}</h4>
         <p>${t.text}</p>
+        ${(t.link || t.address) ? `<div class="tip-extra">
+          ${t.link ? `<a href="${t.link}" target="_blank">→ ${t.linkText || '官方链接'}</a>` : ''}
+          ${t.address ? `<span class="addr">📍 ${t.address}</span>` : ''}
+        </div>` : ''}
       </div>
     `;
     tl.appendChild(row);
   });
+
+  // 迪士尼海洋专题
+  const dg = document.getElementById('disney-guide');
+  if (dg && D.disneySeaGuide) {
+    const G = D.disneySeaGuide;
+    dg.innerHTML = `
+      <div class="disney-head">
+        <h3>${G.title}</h3>
+        <div class="sub">${G.subtitle}</div>
+        <div class="intro">${G.intro}</div>
+      </div>
+      ${G.sections.map((s, i) => {
+        const isLina = s.title.includes('玲娜贝儿') || s.title.includes('LinaBell');
+        return `
+          <div class="disney-section ${isLina ? 'is-lina' : ''}" ${isLina ? 'style="border-top:0;padding-top:0"' : ''}>
+            ${isLina ? '' : `<div class="disney-section-head">
+              <span class="ico">${s.icon}</span>
+              <h4>${s.title}</h4>
+            </div>`}
+            ${isLina ? `<div class="disney-highlight">
+              <span class="label">🎀 LIMITED · 限定</span>
+              <h4 style="font-family:'Caveat',cursive;font-size:1.5rem;color:var(--pink);margin-bottom:.6rem">${s.title}</h4>
+              <div class="disney-grid">
+                ${s.items.map(it => `<div class="t">${it.time}</div><div class="w"><b>${it.what}</b>${it.note ? `<small>${it.note}</small>` : ''}</div>`).join('')}
+              </div>
+            </div>` : `<div class="disney-grid">
+              ${s.items.map(it => `<div class="t">${it.time}</div><div class="w"><b>${it.what}</b>${it.note ? `<small>${it.note}</small>` : ''}</div>`).join('')}
+            </div>`}
+          </div>
+        `;
+      }).join('')}
+    `;
+  }
 </script>
 </body>
 </html>
