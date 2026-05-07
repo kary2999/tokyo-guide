@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>春节东京攻略 · 三种风格</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=DM+Serif+Display&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    font-family: "Noto Sans SC", system-ui, sans-serif;
+    background: #faf8f5;
+    color: #2c2c2c;
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+  header {
+    text-align: center;
+    padding: 4rem 1.5rem 3rem;
+    background:
+      radial-gradient(800px 400px at 20% 0%, #ffe8ee 0%, transparent 60%),
+      radial-gradient(800px 400px at 80% 100%, #f3ead7 0%, transparent 60%),
+      linear-gradient(180deg, #faf8f5, #fff);
+    border-bottom: 1px solid #eee;
+  }
+  header .jp { font-family: "Noto Serif JP", serif; color: #b9382b; letter-spacing: .4em; font-size: 1rem; margin-bottom: .8rem; }
+  header h1 {
+    font-family: "DM Serif Display", "Noto Serif JP", serif;
+    font-size: clamp(2.5rem, 5.5vw, 4rem);
+    font-weight: 700;
+    margin-bottom: .6rem;
+  }
+  header p { color: #6b6b6b; max-width: 700px; margin: 0 auto; font-size: 1.05rem; }
+  header .meta { margin-top: 1.5rem; color: #999; font-size: .9rem; letter-spacing: .15em; }
+
+  main { max-width: 1200px; margin: 0 auto; padding: 4rem 1.5rem; }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 2rem;
+  }
+  .card {
+    border-radius: 24px;
+    padding: 0;
+    overflow: hidden;
+    transition: transform .3s, box-shadow .3s;
+    box-shadow: 0 8px 24px rgba(0,0,0,.06);
+    text-decoration: none; color: inherit;
+    display: flex; flex-direction: column;
+  }
+  .card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,.12); }
+  .card-preview {
+    height: 220px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-body {
+    padding: 1.6rem;
+    background: #fff;
+  }
+  .card-num {
+    display: inline-block; font-family: "DM Serif Display", serif;
+    font-size: .9rem; color: #999; letter-spacing: .2em;
+  }
+  .card h2 {
+    font-family: "DM Serif Display", "Noto Serif JP", serif;
+    font-size: 1.6rem; margin-top: .2rem; margin-bottom: .5rem;
+  }
+  .card .tag-row { display: flex; flex-wrap: wrap; gap: .4rem; margin: .8rem 0; }
+  .card .tag {
+    font-size: .75rem; padding: .15rem .7rem;
+    border-radius: 999px; background: #f3f3f3; color: #555;
+  }
+  .card .desc { color: #666; font-size: .9rem; line-height: 1.6; }
+  .card .open {
+    margin-top: 1rem; display: inline-block;
+    color: #2c2c2c; font-weight: 600; font-size: .9rem;
+    border-bottom: 2px solid #2c2c2c; padding-bottom: 2px;
+  }
+
+  /* Sakura preview */
+  .preview-sakura {
+    background:
+      radial-gradient(circle at 70% 30%, #ffd5e0 0%, transparent 50%),
+      linear-gradient(180deg, #fff5f7, #ffe8ee);
+  }
+  .preview-sakura .title { font-family: "DM Serif Display", serif; font-size: 2.4rem; color: #e26b8a; text-shadow: 2px 2px 0 #fff; }
+  .preview-sakura .petal {
+    position: absolute; width: 14px; height: 14px;
+    background: radial-gradient(circle at 30% 30%, #ffc1d4, #ff8aab);
+    border-radius: 100% 0 100% 0; opacity: .55;
+  }
+  .preview-sakura .petal:nth-child(1) { top: 20px; left: 30px; transform: rotate(20deg); }
+  .preview-sakura .petal:nth-child(2) { top: 60px; right: 40px; transform: rotate(-30deg); }
+  .preview-sakura .petal:nth-child(3) { bottom: 30px; left: 60px; transform: rotate(45deg) scale(.8); }
+  .preview-sakura .petal:nth-child(4) { bottom: 60px; right: 30px; transform: rotate(-15deg) scale(1.2); }
+
+  /* Vintage preview */
+  .preview-vintage {
+    background: #f3ead7;
+    background-image:
+      radial-gradient(circle at 20% 35%, rgba(0,0,0,.05) 0px, transparent 1.5px),
+      radial-gradient(circle at 70% 80%, rgba(0,0,0,.06) 0px, transparent 1.5px);
+    background-size: 6px 6px;
+  }
+  .preview-vintage .title {
+    font-family: "DM Serif Display", serif; font-size: 2.4rem; color: #2b1d10; text-align: center;
+  }
+  .preview-vintage .title small { font-family: "Noto Serif JP", serif; color: #b9382b; display: block; font-size: .8rem; letter-spacing: .4em; margin-bottom: .3rem; }
+  .preview-vintage::before {
+    content: ""; position: absolute; inset: 14px;
+    border: 3px double #2b1d10;
+  }
+
+  /* Journal preview */
+  .preview-journal {
+    background: #fffaf0;
+    background-image:
+      linear-gradient(#c9d8e8 1px, transparent 1px),
+      linear-gradient(90deg, #c9d8e8 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+  .preview-journal .tape {
+    background: #ffd8a8;
+    padding: .3rem 1.2rem;
+    transform: rotate(-3deg);
+    font-family: "Caveat", cursive;
+    box-shadow: 0 4px 8px rgba(0,0,0,.08);
+    margin-bottom: .8rem;
+    font-size: .9rem;
+  }
+  .preview-journal .title { font-family: "Caveat", cursive; font-size: 2.6rem; color: #2a3a52; text-shadow: 3px 3px 0 #fff7c0; transform: rotate(-1deg); }
+  .preview-journal .stick { position: absolute; font-size: 2rem; }
+  .preview-journal .stick.s1 { top: 10px; left: 12px; transform: rotate(-15deg); }
+  .preview-journal .stick.s2 { bottom: 12px; right: 14px; transform: rotate(20deg); }
+
+  footer {
+    text-align: center; padding: 3rem 1rem; color: #999; font-size: .85rem;
+    border-top: 1px solid #eee;
+  }
+  .ghp-note {
+    background: #fffaf0; border: 1px dashed #d4a574;
+    border-radius: 14px; padding: 1.2rem 1.5rem;
+    margin: 2.5rem auto 0; max-width: 720px;
+    font-size: .9rem; line-height: 1.7; color: #5a4628;
+  }
+  .ghp-note h3 { color: #2c2c2c; margin-bottom: .5rem; }
+  .ghp-note code { background: #fff3d6; padding: 1px 5px; border-radius: 3px; font-family: ui-monospace, monospace; font-size: .85em; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="jp">東京旅行案内記</div>
+  <h1>春节东京攻略 · 三种风格预览</h1>
+  <p>同一份 9 天行程 / 美食地图 / 景点详情 / 攻略 Tips,三种 UI 风格任选。点击卡片进入对应模板。</p>
+  <div class="meta">2024.02.09 — 2024.02.17 · 2 人 · 9 天 8 晚</div>
+</header>
+
+<main>
+  <div class="grid">
+
+    <a href="sakura.html" class="card">
+      <div class="card-preview preview-sakura">
+        <span class="petal"></span><span class="petal"></span><span class="petal"></span><span class="petal"></span>
+        <div class="title">春节东京</div>
+      </div>
+      <div class="card-body">
+        <span class="card-num">UI 01 / SAKURA PASTEL</span>
+        <h2>樱花粉彩</h2>
+        <div class="tag-row">
+          <span class="tag">和风浪漫</span>
+          <span class="tag">柔和粉色</span>
+          <span class="tag">樱花飘落</span>
+        </div>
+        <p class="desc">温暖的粉色渐变 + 樱花飘落动画 + 圆润卡片,适合分享给家人朋友。中央时间轴 + 卡片左右交错。</p>
+        <span class="open">打开模板 →</span>
+      </div>
+    </a>
+
+    <a href="vintage.html" class="card">
+      <div class="card-preview preview-vintage">
+        <div class="title">
+          <small>VOL.01 · MMXXIV</small>
+          TOKYO GUIDE
+        </div>
+      </div>
+      <div class="card-body">
+        <span class="card-num">UI 02 / VINTAGE PRINT</span>
+        <h2>复古印刷</h2>
+        <div class="tag-row">
+          <span class="tag">报刊感</span>
+          <span class="tag">米色纸张</span>
+          <span class="tag">印章 + 衬线</span>
+        </div>
+        <p class="desc">米色纸张质感 + 衬线大字 + 双线边框 + 红色 APPROVED 印章,像一本老式旅行手册或杂志专题。</p>
+        <span class="open">打开模板 →</span>
+      </div>
+    </a>
+
+    <a href="journal.html" class="card">
+      <div class="card-preview preview-journal">
+        <span class="stick s1">🌸</span>
+        <span class="stick s2">✈️</span>
+        <div style="text-align:center">
+          <div class="tape">My Travel Journal</div>
+          <div class="title">东京手账</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <span class="card-num">UI 03 / TRAVEL JOURNAL</span>
+        <h2>手账风</h2>
+        <div class="tag-row">
+          <span class="tag">方格本</span>
+          <span class="tag">胶带 + 便签</span>
+          <span class="tag">拍立得</span>
+        </div>
+        <p class="desc">方格背景 + 手写字体 + 胶带贴纸 + 便利贴 + 拍立得卡,像翻开一本真实的旅行手账本。</p>
+        <span class="open">打开模板 →</span>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="ghp-note">
+    <h3>💡 关于 GitHub Pages 部署</h3>
+    部署后,把仓库设置 → Pages → Source 选 <code>main / root</code>,这个 <code>index.html</code> 会作为首页显示三种风格的卡片入口,
+    点击任一卡片就能进入对应模板。三个模板共享 <code>data.js</code>,如果想改行程内容,只需改一个文件,三套 UI 同步更新。
+  </div>
+</main>
+
+<footer>
+  © 2024 Len's Tokyo Trip · Crafted with care
+</footer>
+
+</body>
+</html>

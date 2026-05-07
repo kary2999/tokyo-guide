@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>春节东京攻略 · 复古印刷</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Serif+JP:wght@400;700;900&family=Noto+Serif+SC:wght@400;700;900&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root {
+    --paper: #f3ead7;
+    --paper-dark: #e9dfc6;
+    --ink: #2b1d10;
+    --ink-soft: #6b5135;
+    --red: #b9382b;
+    --red-stamp: #c63d2c;
+    --gold: #b89150;
+    --line: #8a7048;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    color: var(--ink);
+    font-family: "Noto Serif SC", "Noto Serif JP", "Songti SC", serif;
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 20% 35%, rgba(0,0,0,.04) 0px, transparent 1px),
+      radial-gradient(circle at 70% 80%, rgba(0,0,0,.05) 0px, transparent 1.5px),
+      radial-gradient(circle at 40% 60%, rgba(0,0,0,.03) 0px, transparent 1px),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .15  0 0 0 0 .12  0 0 0 0 .08  0 0 0 .12 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+    background-size: 6px 6px, 6px 6px, 6px 6px, 200px 200px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+  .typewriter { font-family: "Special Elite", "Noto Serif SC", monospace; }
+  .display { font-family: "DM Serif Display", "Noto Serif JP", serif; }
+
+  /* 顶部 */
+  header.cover {
+    position: relative;
+    padding: 4rem 2rem 3rem;
+    border-bottom: 6px double var(--ink);
+    text-align: center;
+  }
+  header.cover::before {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -14px;
+    height: 4px; background: var(--ink);
+  }
+  .ribbon-top {
+    display: flex; justify-content: space-between; align-items: center;
+    max-width: 1100px; margin: 0 auto 1.5rem;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    padding: .5rem 0;
+    font-family: "Special Elite", monospace;
+    font-size: .8rem; letter-spacing: .25em;
+    color: var(--ink-soft);
+  }
+  .cover h1 {
+    font-family: "DM Serif Display", "Noto Serif SC", serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    color: var(--ink);
+    letter-spacing: .02em;
+    line-height: 1; margin: .8rem 0;
+  }
+  .cover .jp-title {
+    font-family: "Noto Serif JP", serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: .5em;
+    color: var(--red);
+    margin-bottom: 1rem;
+  }
+  .cover .lead {
+    max-width: 700px; margin: 1.2rem auto 0;
+    font-style: italic; color: var(--ink-soft);
+    font-size: 1.05rem;
+  }
+  .stamp {
+    position: absolute; right: 6%; top: 3.5rem;
+    transform: rotate(-12deg);
+    border: 3px double var(--red-stamp); color: var(--red-stamp);
+    padding: .5rem 1rem; font-family: "Special Elite", monospace;
+    font-size: .85rem; letter-spacing: .15em;
+    opacity: .85;
+  }
+  .stamp small { display: block; font-size: .65rem; letter-spacing: .3em; }
+
+  /* 导航 */
+  nav.tabs {
+    position: sticky; top: 0; z-index: 9;
+    background: var(--paper);
+    border-bottom: 1px solid var(--ink);
+    padding: .5rem 1rem;
+    display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;
+    font-family: "Special Elite", monospace;
+    font-size: .9rem; letter-spacing: .2em;
+  }
+  nav.tabs a { color: var(--ink); text-decoration: none; padding: .3rem .6rem; }
+  nav.tabs a:hover { color: var(--red); }
+
+  section { max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+  .sec-head {
+    border-top: 4px double var(--ink); border-bottom: 1px solid var(--ink);
+    padding: 1rem 0; margin-bottom: 2.5rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .sec-head h2 {
+    font-family: "DM Serif Display", "Noto Serif SC", serif;
+    font-size: 2rem;
+  }
+  .sec-head .sub {
+    font-family: "Special Elite", monospace;
+    font-size: .85rem; letter-spacing: .3em; color: var(--ink-soft);
+  }
+
+  /* 行程 */
+  .days {
+    display: grid; grid-template-columns: 1fr; gap: 2rem;
+  }
+  .day {
+    display: grid; grid-template-columns: 200px 1fr;
+    gap: 2rem;
+    background: rgba(255,253,245,.55);
+    border: 1px solid var(--line); border-left: 6px solid var(--red);
+    padding: 1.5rem;
+    box-shadow: 4px 4px 0 var(--paper-dark);
+    position: relative;
+  }
+  .day-side {
+    border-right: 1px dashed var(--line); padding-right: 1rem;
+  }
+  .day-num {
+    font-family: "DM Serif Display", serif;
+    font-size: 4.5rem; line-height: 1;
+    color: var(--red); font-weight: 900;
+  }
+  .day-num small { font-size: .6em; color: var(--ink); display: block; letter-spacing: .15em; }
+  .day-date-tag {
+    background: var(--ink); color: var(--paper);
+    display: inline-block; padding: .15rem .6rem; margin-top: .6rem;
+    font-family: "Special Elite", monospace; font-size: .8rem; letter-spacing: .2em;
+  }
+  .day-emoji { font-size: 2.4rem; margin-top: .4rem; }
+  .day-city { color: var(--ink-soft); font-size: .85rem; margin-top: .4rem; letter-spacing: .1em; }
+  .day-content { padding-left: .5rem; }
+  .day-content h3 {
+    font-family: "DM Serif Display", "Noto Serif SC", serif;
+    font-size: 1.6rem; margin-bottom: .8rem; color: var(--ink);
+  }
+  .day-lunar {
+    background: var(--red-stamp); color: #fff; font-family: "Special Elite", monospace;
+    padding: .15rem .5rem; font-size: .75rem; margin-left: .5rem;
+    letter-spacing: .15em;
+  }
+  table.timetable {
+    width: 100%; border-collapse: collapse; margin-top: .5rem;
+    font-size: .9rem;
+  }
+  table.timetable td {
+    padding: .55rem .5rem;
+    border-bottom: 1px dashed var(--line);
+    vertical-align: top;
+  }
+  table.timetable td:first-child {
+    font-family: "Special Elite", monospace;
+    color: var(--red); white-space: nowrap; width: 80px;
+    font-size: .85rem; letter-spacing: .1em;
+  }
+  table.timetable td:nth-child(2) {
+    width: 70px;
+    font-family: "Special Elite", monospace;
+    font-size: .72rem; color: var(--ink-soft);
+    border-right: 1px solid var(--line);
+    text-transform: uppercase; letter-spacing: .15em;
+  }
+
+  /* 美食 */
+  .food-block { margin-bottom: 2.5rem; }
+  .food-area-head {
+    display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1rem;
+    border-bottom: 2px solid var(--ink); padding-bottom: .4rem;
+  }
+  .food-area-head h3 {
+    font-family: "DM Serif Display", "Noto Serif SC", serif;
+    font-size: 1.5rem;
+  }
+  .food-area-head .num {
+    font-family: "Special Elite", monospace;
+    color: var(--red); font-size: 1rem; letter-spacing: .15em;
+  }
+  .food-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0; }
+  .food-item {
+    border: 1px solid var(--line); padding: 1rem 1.2rem;
+    background: rgba(255,253,245,.55);
+    margin: -.5px;
+    position: relative;
+  }
+  .food-item h4 {
+    font-family: "DM Serif Display", "Noto Serif SC", serif;
+    font-size: 1.1rem; margin-bottom: .2rem;
+    border-bottom: 1px solid var(--line); padding-bottom: .3rem;
+  }
+  .food-item .meta {
+    display: flex; justify-content: space-between;
+    font-family: "Special Elite", monospace; font-size: .78rem;
+    color: var(--ink-soft); margin: .3rem 0;
+  }
+  .food-item .meta .price { color: var(--red); }
+  .food-item p { font-size: .85rem; margin-top: .4rem; line-height: 1.6; }
+  .food-item a {
+    margin-top: .5rem; display: inline-block; color: var(--ink);
+    text-decoration: none; font-family: "Special Elite", monospace;
+    font-size: .75rem; letter-spacing: .15em;
+    border-bottom: 1px solid var(--ink);
+  }
+  .food-item a:hover { color: var(--red); border-color: var(--red); }
+
+  /* 地图 */
+  #leaflet-map {
+    height: 480px;
+    border: 4px double var(--ink);
+    box-shadow: 8px 8px 0 var(--paper-dark);
+    filter: sepia(.18) saturate(.9);
+  }
+  .leaflet-popup-content-wrapper {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    box-shadow: 4px 4px 0 var(--ink);
+    font-family: "Noto Serif SC", serif;
+  }
+  .leaflet-popup-content { margin: .8rem 1rem; line-height: 1.6; color: var(--ink); }
+  .leaflet-popup-content b { color: var(--red); font-family: "DM Serif Display", serif; }
+  .leaflet-popup-tip { background: var(--paper); border: 1px solid var(--ink); }
+  .map-legend {
+    display: flex; justify-content: center; gap: 2rem; margin-top: 1rem;
+    font-family: "Special Elite", monospace; font-size: .8rem;
+    letter-spacing: .15em; color: var(--ink-soft);
+  }
+  .map-legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--red); margin-right: .3rem; }
+  .map-legend .dot.food { background: var(--gold); }
+
+  /* 个人相册 */
+  .my-photos {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+  .my-photo {
+    aspect-ratio: 4/3;
+    border: 8px solid #fff;
+    box-shadow: 4px 4px 0 var(--ink);
+    overflow: hidden;
+    position: relative;
+    background: var(--paper-dark);
+    transition: transform .25s;
+  }
+  .my-photo:nth-child(odd) { transform: rotate(-1deg); }
+  .my-photo:nth-child(even) { transform: rotate(1deg); }
+  .my-photo:hover { transform: rotate(0) translateY(-3px); }
+  .my-photo img { width: 100%; height: 100%; object-fit: cover; display: block; filter: sepia(.1); }
+
+  /* 景点 */
+  .attractions {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.5rem;
+  }
+  .attr {
+    background: rgba(255,253,245,.7);
+    border: 2px solid var(--ink); padding: 0;
+    box-shadow: 6px 6px 0 var(--ink);
+    position: relative;
+    transition: transform .25s, box-shadow .25s;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .attr-photo {
+    height: 180px;
+    background-size: cover; background-position: center;
+    border-bottom: 2px solid var(--ink);
+    position: relative;
+    filter: sepia(.18) saturate(.9) contrast(1.05);
+  }
+  .attr-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .attr-photo::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 100%, transparent 60%, rgba(43,29,16,.15));
+    pointer-events: none;
+  }
+  .attr-body { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+  .attr:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--ink); }
+  .attr-head {
+    border-bottom: 2px solid var(--ink); padding-bottom: .6rem;
+    display: flex; justify-content: space-between; align-items: flex-start;
+  }
+  .attr-name {
+    font-family: "DM Serif Display", "Noto Serif SC", serif;
+    font-size: 1.3rem;
+  }
+  .attr-tag {
+    background: var(--ink); color: var(--paper);
+    font-family: "Special Elite", monospace; font-size: .7rem;
+    padding: .15rem .5rem; letter-spacing: .15em;
+  }
+  .attr-meta {
+    display: flex; gap: 1.5rem; margin: .8rem 0;
+    font-family: "Special Elite", monospace; font-size: .8rem;
+    color: var(--ink-soft);
+  }
+  .attr-desc { font-size: .9rem; line-height: 1.7; margin-bottom: .8rem; }
+  .attr-tips {
+    border-top: 1px dashed var(--line); padding-top: .6rem;
+    margin-top: .5rem;
+  }
+  .attr-tips li {
+    list-style: none; padding-left: 1.2rem; position: relative;
+    font-size: .82rem; line-height: 1.65;
+    color: var(--ink-soft);
+  }
+  .attr-tips li::before { content: "▶"; position: absolute; left: 0; color: var(--red); font-size: .7em; top: .35em; }
+  .attr a {
+    margin-top: .8rem; display: inline-block; color: var(--ink);
+    font-family: "Special Elite", monospace; font-size: .75rem;
+    text-decoration: none; border: 1px solid var(--ink); padding: .3rem .6rem;
+  }
+  .attr a:hover { background: var(--ink); color: var(--paper); }
+
+  /* Tips */
+  .tips {
+    column-count: 2; column-gap: 2rem;
+  }
+  .tip {
+    break-inside: avoid;
+    border-left: 4px solid var(--red);
+    padding: 1rem 1.2rem; margin-bottom: 1.2rem;
+    background: rgba(255,253,245,.55);
+  }
+  .tip-num {
+    font-family: "DM Serif Display", serif; font-size: 1.3rem; color: var(--red);
+    font-weight: 900; display: inline-block; margin-right: .5rem;
+  }
+  .tip-title {
+    font-family: "DM Serif Display", "Noto Serif SC", serif;
+    font-size: 1.05rem; display: inline;
+  }
+  .tip-text { font-size: .87rem; margin-top: .4rem; line-height: 1.65; color: var(--ink); }
+
+  footer {
+    border-top: 6px double var(--ink); padding: 3rem 1rem;
+    text-align: center;
+    font-family: "Special Elite", monospace; letter-spacing: .25em;
+    color: var(--ink-soft); font-size: .8rem;
+  }
+  footer .kanji { font-family: "Noto Serif JP", serif; font-size: 2rem; color: var(--red); margin-bottom: .8rem; }
+
+  @media (max-width: 768px) {
+    .day { grid-template-columns: 1fr; }
+    .day-side { border-right: 0; border-bottom: 1px dashed var(--line); padding-bottom: 1rem; }
+    .tips { column-count: 1; }
+    .stamp { right: 5%; top: 1rem; transform: rotate(-12deg) scale(.8); }
+  }
+</style>
+</head>
+<body>
+
+<header class="cover">
+  <div class="stamp">APPROVED<small>2024 · TOKYO</small></div>
+  <div class="ribbon-top">
+    <span>VOL.01 · ISSUE 2024</span>
+    <span>春節 / SPRING FESTIVAL</span>
+    <span>EAST ASIA · ¥0</span>
+  </div>
+  <div class="jp-title">東京旅行案内記</div>
+  <h1>春节东京攻略</h1>
+  <div class="typewriter" style="font-size:1rem;letter-spacing:.3em;color:var(--ink-soft);margin-top:.5rem">
+    THE TOKYO TRAVEL CHRONICLE · MMXXIV
+  </div>
+  <p class="lead">
+    一份从 USJ 到迪士尼海洋、从富士急到镰仓高校前的九日行旅手册。<br>
+    依据真实出行整理,适合跨年/春节高峰季节赴日参考。
+  </p>
+</header>
+
+<nav class="tabs">
+  <a href="#map">MAP</a>
+  <a href="#days">ITINERARY</a>
+  <a href="#food">CUISINE</a>
+  <a href="#attractions">SIGHTS</a>
+  <a href="#photos">ALBUM</a>
+  <a href="#tips">NOTES</a>
+  <a href="gallery.html">SWITCH STYLE ↗</a>
+</nav>
+
+<section id="map">
+  <div class="sec-head">
+    <h2>地图总览 · MAP</h2>
+    <div class="sub">PROLOGUE</div>
+  </div>
+  <div id="leaflet-map"></div>
+  <div class="map-legend">
+    <span><i class="dot"></i>SIGHTS · 13</span>
+    <span><i class="dot food"></i>CUISINE · 24</span>
+    <span>· CLICK MARKER FOR DETAILS</span>
+  </div>
+</section>
+
+<section id="days">
+  <div class="sec-head">
+    <h2>九日行程 · ITINERARY</h2>
+    <div class="sub">CHAPTER · I</div>
+  </div>
+  <div class="days" id="days-list"></div>
+</section>
+
+<section id="food">
+  <div class="sec-head">
+    <h2>美食地图 · CUISINE</h2>
+    <div class="sub">CHAPTER · II</div>
+  </div>
+  <div id="food-list"></div>
+</section>
+
+<section id="attractions">
+  <div class="sec-head">
+    <h2>景点详情 · SIGHTS</h2>
+    <div class="sub">CHAPTER · III</div>
+  </div>
+  <div class="attractions" id="attr-list"></div>
+</section>
+
+<section id="photos">
+  <div class="sec-head">
+    <h2>个人相册 · ALBUM</h2>
+    <div class="sub">CHAPTER · V</div>
+  </div>
+  <div class="my-photos" id="my-photos"></div>
+</section>
+
+<section id="tips">
+  <div class="sec-head">
+    <h2>攻略札记 · NOTES & TICKETS</h2>
+    <div class="sub">CHAPTER · IV</div>
+  </div>
+  <div class="tips" id="tips-list"></div>
+</section>
+
+<footer>
+  <div class="kanji">完</div>
+  PRINTED BY LEN · TOKYO MMXXIV · ALL RIGHTS RESERVED
+</footer>
+
+<script src="data.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const D = window.GUIDE_DATA;
+
+  // 行程
+  const days = document.getElementById('days-list');
+  D.days.forEach(d => {
+    const day = document.createElement('div');
+    day.className = 'day';
+    day.innerHTML = `
+      <div class="day-side">
+        <div class="day-num">${String(d.idx).padStart(2,'0')}<small>DAY</small></div>
+        <div class="day-date-tag">${d.date}</div>
+        <div class="day-emoji">${d.emoji}</div>
+        <div class="day-city">${d.city}</div>
+      </div>
+      <div class="day-content">
+        <h3>${d.title}<span class="day-lunar">${d.lunar}</span></h3>
+        <table class="timetable">
+          ${d.blocks.map(b => `<tr><td>${b.time}</td><td>${b.tag}</td><td>${b.text}</td></tr>`).join('')}
+        </table>
+      </div>
+    `;
+    days.appendChild(day);
+  });
+
+  // 美食
+  const fl = document.getElementById('food-list');
+  let idx = 1;
+  Object.entries(D.food).forEach(([area, items]) => {
+    const block = document.createElement('div');
+    block.className = 'food-block';
+    block.innerHTML = `
+      <div class="food-area-head">
+        <span class="num">No. ${String(idx++).padStart(2,'0')}</span>
+        <h3>${area}</h3>
+      </div>
+      <div class="food-list">
+        ${items.map(f => `
+          <div class="food-item">
+            <h4>${f.name}</h4>
+            <div class="meta"><span>${f.area}</span><span class="price">${f.price}</span></div>
+            <p>${f.note}</p>
+            ${f.url ? `<a href="${f.url}" target="_blank">VIEW MAP →</a>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    `;
+    fl.appendChild(block);
+  });
+
+  // 景点
+  const al = document.getElementById('attr-list');
+  D.attractions.forEach(a => {
+    const div = document.createElement('div');
+    div.className = 'attr';
+    div.innerHTML = `
+      <div class="attr-photo" style="background:${a.gradient || '#8a7048'}">
+        ${a.image ? `<img src="${a.image}" alt="${a.name}" loading="lazy" onerror="this.style.display='none'">` : ''}
+      </div>
+      <div class="attr-body">
+        <div class="attr-head">
+          <div class="attr-name">${a.name}</div>
+          <div class="attr-tag">${a.tag}</div>
+        </div>
+        <div class="attr-meta">
+          <span>HOURS · ${a.hours}</span>
+          <span>FEE · ${a.price}</span>
+        </div>
+        <div class="attr-desc">${a.desc}</div>
+        <ul class="attr-tips">${a.tips.map(t => `<li>${t}</li>`).join('')}</ul>
+        ${a.url ? `<a href="${a.url}" target="_blank">OFFICIAL LINK</a>` : ''}
+        <a href="https://www.google.com/maps/search/?api=1&query=${a.lat},${a.lng}" target="_blank" style="margin-left:.5rem">GOOGLE MAPS</a>
+      </div>
+    `;
+    al.appendChild(div);
+  });
+
+  // 个人相册
+  const mp = document.getElementById('my-photos');
+  D.myPhotos.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'my-photo';
+    div.innerHTML = `<img src="${p.src}" alt="${p.caption}" loading="lazy" onerror="this.parentElement.style.display='none'">`;
+    mp.appendChild(div);
+  });
+
+  // Leaflet
+  const map = L.map('leaflet-map', { scrollWheelZoom: false }).setView([35.68, 139.78], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  const sightIcon = L.divIcon({
+    className: '', iconSize: [22,22], iconAnchor: [11,11],
+    html: `<div style="width:18px;height:18px;border-radius:50%;background:#b9382b;border:3px solid #f3ead7;box-shadow:0 0 0 1px #2b1d10"></div>`
+  });
+  const eatIcon = L.divIcon({
+    className: '', iconSize: [16,16], iconAnchor: [8,8],
+    html: `<div style="width:12px;height:12px;border-radius:50%;background:#b89150;border:2px solid #f3ead7;box-shadow:0 0 0 1px #2b1d10"></div>`
+  });
+
+  const bounds = [];
+  D.attractions.forEach(a => {
+    if (a.lat && a.lng) {
+      L.marker([a.lat, a.lng], {icon: sightIcon})
+        .bindPopup(`<b>${a.name}</b><br><small>${a.tag} · ${a.hours} · ${a.price}</small><br><a href="https://www.google.com/maps/search/?api=1&query=${a.lat},${a.lng}" target="_blank">在 Google Maps 打开 →</a>`)
+        .addTo(map);
+      bounds.push([a.lat, a.lng]);
+    }
+  });
+  Object.entries(D.food).forEach(([area, items]) => {
+    items.forEach(f => {
+      if (f.lat && f.lng) {
+        L.marker([f.lat, f.lng], {icon: eatIcon})
+          .bindPopup(`<b>${f.name}</b><br><small>${area}</small><br>${f.note}<br><a href="https://www.google.com/maps/search/?api=1&query=${f.lat},${f.lng}" target="_blank">导航 →</a>`)
+          .addTo(map);
+        bounds.push([f.lat, f.lng]);
+      }
+    });
+  });
+  if (bounds.length) map.fitBounds(bounds, { padding: [40,40] });
+
+  // Tips
+  const tl = document.getElementById('tips-list');
+  D.tips.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'tip';
+    div.innerHTML = `
+      <span class="tip-num">${String(i+1).padStart(2,'0')}.</span>
+      <span class="tip-title">${t.icon} ${t.title}</span>
+      <div class="tip-text">${t.text}</div>
+    `;
+    tl.appendChild(div);
+  });
+</script>
+</body>
+</html>

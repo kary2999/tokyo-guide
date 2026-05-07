@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>春节东京攻略 · 樱花粉彩</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root {
+    --bg-1: #fff5f7;
+    --bg-2: #ffe8ee;
+    --pink: #ff8aab;
+    --pink-deep: #e26b8a;
+    --pink-soft: #ffd5e0;
+    --cream: #fff9f1;
+    --ink: #4a2c3a;
+    --ink-soft: #7e5b6b;
+    --gold: #d4a574;
+    --shadow: 0 8px 24px rgba(255,138,171,.18);
+    --shadow-strong: 0 14px 40px rgba(255,138,171,.28);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(1200px 600px at 90% -10%, #ffd9e4 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 30%, #ffe1d6 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    min-height: 100vh;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+  .jp { font-family: "Noto Serif JP", serif; }
+  .hand { font-family: "Caveat", cursive; }
+
+  /* 樱花飘落 */
+  .petal {
+    position: fixed; top: -20px; pointer-events: none; z-index: 0;
+    width: 14px; height: 14px;
+    background: radial-gradient(circle at 30% 30%, #ffc1d4, #ff8aab);
+    border-radius: 100% 0 100% 0;
+    opacity: .55;
+    animation: fall linear infinite;
+  }
+  @keyframes fall {
+    0%   { transform: translateY(-20px) rotate(0deg); }
+    100% { transform: translateY(110vh) rotate(720deg); }
+  }
+
+  header.hero {
+    position: relative;
+    padding: 6rem 2rem 4rem;
+    text-align: center;
+    overflow: hidden;
+  }
+  header.hero::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 20% 80%, rgba(255,255,255,.6) 0%, transparent 40%),
+      radial-gradient(circle at 80% 20%, rgba(255,209,224,.7) 0%, transparent 40%);
+  }
+  .hero-inner { position: relative; z-index: 2; }
+  .hero h1 {
+    font-size: clamp(2.4rem, 6vw, 4.5rem);
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: var(--pink-deep);
+    text-shadow: 2px 2px 0 #fff, 4px 4px 0 var(--pink-soft);
+    margin-bottom: .8rem;
+  }
+  .hero .jp-sub {
+    font-size: 1.1rem; color: var(--ink-soft); letter-spacing: .3em;
+    margin-bottom: 1.5rem;
+  }
+  .hero-meta {
+    display: inline-flex; gap: 2rem; flex-wrap: wrap; justify-content: center;
+    background: rgba(255,255,255,.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid #fff;
+    border-radius: 999px;
+    padding: 1rem 2rem;
+    box-shadow: var(--shadow);
+  }
+  .hero-meta span { display: inline-flex; align-items: center; gap: .4rem; color: var(--ink); }
+  .hero-meta b { color: var(--pink-deep); }
+
+  /* 导航 */
+  nav.tabs {
+    position: sticky; top: 0; z-index: 10;
+    backdrop-filter: blur(12px);
+    background: rgba(255,245,247,.85);
+    border-bottom: 1px solid rgba(255,138,171,.18);
+    padding: .9rem 1rem;
+    display: flex; justify-content: center; gap: .5rem; flex-wrap: wrap;
+  }
+  nav.tabs a {
+    color: var(--ink-soft); text-decoration: none;
+    padding: .5rem 1.2rem; border-radius: 999px;
+    font-size: .95rem; font-weight: 500;
+    transition: all .2s;
+  }
+  nav.tabs a:hover { background: var(--pink-soft); color: var(--pink-deep); }
+
+  section { max-width: 1200px; margin: 0 auto; padding: 4rem 1.5rem; }
+  .section-head { text-align: center; margin-bottom: 3rem; position: relative; }
+  .section-head h2 {
+    font-size: 2.2rem; color: var(--pink-deep); display: inline-block; position: relative;
+  }
+  .section-head h2::before, .section-head h2::after {
+    content: "❀"; color: var(--pink); margin: 0 1rem; font-size: 1.4rem;
+  }
+  .section-head p { color: var(--ink-soft); margin-top: .3rem; letter-spacing: .2em; font-size: .9rem; }
+
+  /* 行程时间轴 */
+  .timeline { position: relative; padding-left: 0; }
+  .timeline::before {
+    content: ""; position: absolute; left: 50%; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--pink) 0%, var(--pink-soft) 100%);
+    transform: translateX(-50%);
+    border-radius: 3px;
+  }
+  .day-card {
+    position: relative; width: calc(50% - 3rem);
+    background: rgba(255,255,255,.92);
+    border-radius: 24px; padding: 1.5rem 1.8rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2.5rem;
+    transition: transform .3s, box-shadow .3s;
+  }
+  .day-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-strong); }
+  .day-card:nth-child(odd) { margin-left: 0; }
+  .day-card:nth-child(even) { margin-left: calc(50% + 3rem); }
+  .day-card::before {
+    content: ""; position: absolute; top: 2rem;
+    width: 18px; height: 18px;
+    background: var(--pink); border: 4px solid #fff; border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--pink-soft);
+  }
+  .day-card:nth-child(odd)::before { right: -3.6rem; }
+  .day-card:nth-child(even)::before { left: -3.6rem; }
+
+  .day-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .day-emoji { font-size: 2.2rem; }
+  .day-date { color: var(--ink-soft); font-size: .85rem; letter-spacing: .15em; }
+  .day-title { font-size: 1.25rem; font-weight: 700; color: var(--pink-deep); margin-top: .2rem; }
+  .day-lunar {
+    display: inline-block; background: var(--pink-soft); color: var(--pink-deep);
+    padding: .15rem .8rem; border-radius: 999px; font-size: .75rem; margin-left: .4rem;
+  }
+  .day-city { color: var(--gold); font-size: .85rem; }
+  .blocks { border-top: 1px dashed var(--pink-soft); padding-top: .8rem; }
+  .block {
+    display: grid; grid-template-columns: 70px 60px 1fr; gap: .6rem;
+    padding: .55rem 0; border-bottom: 1px dotted var(--pink-soft);
+    font-size: .92rem;
+  }
+  .block:last-child { border-bottom: 0; }
+  .block-time { color: var(--pink-deep); font-weight: 700; font-size: .82rem; }
+  .block-tag {
+    background: var(--pink-soft); color: var(--pink-deep);
+    padding: .1rem .5rem; border-radius: 6px;
+    font-size: .72rem; height: 1.4rem; align-self: center; text-align: center;
+  }
+  .block-text { color: var(--ink); line-height: 1.55; }
+
+  /* 美食 */
+  .food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+  .food-area-title {
+    grid-column: 1/-1;
+    font-size: 1.3rem; color: var(--pink-deep); padding-bottom: .4rem;
+    border-bottom: 2px dashed var(--pink-soft); margin-top: 1rem;
+  }
+  .food-area-title::before { content: "🌸 "; }
+  .food-card {
+    background: rgba(255,255,255,.94); border-radius: 18px;
+    padding: 1.2rem; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: .4rem;
+    transition: transform .25s, box-shadow .25s;
+  }
+  .food-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-strong); }
+  .food-name { font-size: 1.05rem; font-weight: 700; color: var(--ink); }
+  .food-area { color: var(--ink-soft); font-size: .82rem; }
+  .food-price { color: var(--pink-deep); font-weight: 600; font-size: .9rem; }
+  .food-note { font-size: .85rem; color: var(--ink-soft); margin-top: .3rem; line-height: 1.5; }
+  .food-link { color: var(--gold); text-decoration: none; font-size: .8rem; align-self: flex-start;
+    margin-top: .4rem; border-bottom: 1px dotted var(--gold); }
+  .food-link:hover { color: var(--pink-deep); border-bottom-color: var(--pink-deep); }
+
+  /* 地图 */
+  #leaflet-map {
+    height: 480px; border-radius: 24px;
+    box-shadow: var(--shadow-strong);
+    border: 4px solid #fff;
+    overflow: hidden;
+  }
+  .leaflet-popup-content-wrapper {
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(255,138,171,.25);
+  }
+  .leaflet-popup-content { font-family: "Noto Sans SC", system-ui; margin: .8rem 1rem; line-height: 1.6; }
+  .leaflet-popup-content b { color: var(--pink-deep); font-size: 1.05rem; }
+  .leaflet-popup-content small { color: var(--ink-soft); }
+  .map-legend {
+    display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+    margin-top: 1rem; font-size: .85rem; color: var(--ink-soft);
+  }
+  .map-legend span { display: inline-flex; align-items: center; gap: .3rem; }
+  .map-legend .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--pink); display: inline-block; }
+  .map-legend .dot.food { background: var(--gold); }
+
+  /* 个人相册 */
+  .my-photos {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+  .my-photo {
+    aspect-ratio: 4/3; border-radius: 18px; overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform .25s;
+    background: var(--pink-soft);
+    position: relative;
+  }
+  .my-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .my-photo:hover { transform: scale(1.03); box-shadow: var(--shadow-strong); }
+  .my-photo::after {
+    content: attr(data-cap); position: absolute; left: 0; right: 0; bottom: 0;
+    padding: .5rem .8rem; background: linear-gradient(transparent, rgba(0,0,0,.55));
+    color: #fff; font-size: .8rem; opacity: 0; transition: opacity .25s;
+  }
+  .my-photo:hover::after { opacity: 1; }
+
+  /* 景点 */
+  .attractions { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+  .attr-card {
+    background: linear-gradient(160deg, #fff 0%, #fff5f7 100%);
+    border-radius: 22px; padding: 0;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255,138,171,.15);
+    position: relative; overflow: hidden;
+    transition: transform .3s;
+    display: flex; flex-direction: column;
+  }
+  .attr-photo {
+    height: 180px;
+    background-size: cover; background-position: center;
+    background-color: var(--pink-soft);
+    position: relative;
+  }
+  .attr-photo.no-img { display: flex; align-items: center; justify-content: center; font-size: 3.5rem; }
+  .attr-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .attr-card-body { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+  .attr-card::before {
+    content: ""; position: absolute; top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, var(--pink-soft), transparent 70%);
+    opacity: .6;
+  }
+  .attr-card:hover { transform: translateY(-4px); }
+  .attr-head { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 1; }
+  .attr-name { font-size: 1.2rem; font-weight: 700; color: var(--pink-deep); }
+  .attr-tag {
+    background: var(--pink); color: #fff; padding: .2rem .7rem;
+    border-radius: 999px; font-size: .72rem; font-weight: 600;
+  }
+  .attr-meta { display: flex; gap: 1rem; margin: .6rem 0; font-size: .82rem; color: var(--ink-soft); }
+  .attr-desc { color: var(--ink); font-size: .9rem; line-height: 1.65; margin-bottom: .8rem; }
+  .attr-tips { background: rgba(255,213,224,.4); border-radius: 12px; padding: .8rem 1rem; }
+  .attr-tips li { font-size: .82rem; color: var(--ink); list-style: none; padding-left: 1.2rem; position: relative; line-height: 1.6; }
+  .attr-tips li::before { content: "✿"; position: absolute; left: 0; color: var(--pink); }
+  .attr-link {
+    margin-top: .8rem; display: inline-block; color: var(--gold);
+    text-decoration: none; font-size: .82rem; border-bottom: 1px dotted var(--gold);
+  }
+
+  /* Tips */
+  .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.2rem; }
+  .tip {
+    background: #fff; border-radius: 18px; padding: 1.3rem;
+    box-shadow: var(--shadow); position: relative;
+    border-top: 3px solid var(--pink);
+  }
+  .tip-icon { font-size: 1.8rem; margin-bottom: .5rem; }
+  .tip-title { font-weight: 700; color: var(--pink-deep); margin-bottom: .4rem; font-size: 1rem; }
+  .tip-text { font-size: .85rem; color: var(--ink-soft); line-height: 1.65; }
+
+  footer {
+    text-align: center; padding: 3rem 1rem; color: var(--ink-soft);
+    font-size: .85rem; letter-spacing: .15em;
+  }
+  footer .hand { font-size: 1.4rem; color: var(--pink-deep); display: block; margin-bottom: .4rem; }
+
+  @media (max-width: 768px) {
+    .timeline::before { left: 18px; }
+    .day-card { width: calc(100% - 3rem); margin-left: 3rem !important; }
+    .day-card::before { left: -2.4rem !important; right: auto !important; }
+    nav.tabs { padding: .6rem; }
+    nav.tabs a { padding: .35rem .8rem; font-size: .85rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 樱花飘落 -->
+<div id="petals"></div>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="jp-sub jp">桜の季節 · 東京旅行記</div>
+    <h1>春节东京攻略</h1>
+    <div class="hand" style="font-size:1.8rem;color:var(--pink-deep);margin:.4rem 0 1.5rem">Tokyo · Sakura · 2024</div>
+    <div class="hero-meta">
+      <span>📅 <b id="date-range"></b></span>
+      <span>👥 <b id="travelers"></b></span>
+      <span>🗾 <b>东京 · 大阪 · 富士山</b></span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <a href="#map">地图总览</a>
+  <a href="#days">9 天行程</a>
+  <a href="#food">美食地图</a>
+  <a href="#attractions">景点详情</a>
+  <a href="#photos">我的相册</a>
+  <a href="#tips">攻略 Tips</a>
+  <a href="gallery.html">🎨 切换风格</a>
+</nav>
+
+<section id="map">
+  <div class="section-head">
+    <h2>地图总览</h2>
+    <p>INTERACTIVE MAP · 13 SPOTS + 24 EATS</p>
+  </div>
+  <div id="leaflet-map"></div>
+  <div class="map-legend">
+    <span><i class="dot"></i>景点(13)</span>
+    <span><i class="dot food"></i>美食(24)</span>
+    <span>· 点击 marker 看详情,可一键跳 Google Maps</span>
+  </div>
+</section>
+
+<section id="days">
+  <div class="section-head">
+    <h2>9 天行程时间轴</h2>
+    <p>NINE DAYS ITINERARY</p>
+  </div>
+  <div class="timeline" id="timeline"></div>
+</section>
+
+<section id="food">
+  <div class="section-head">
+    <h2>美食地图清单</h2>
+    <p>FOOD GUIDE</p>
+  </div>
+  <div id="food-area"></div>
+</section>
+
+<section id="attractions">
+  <div class="section-head">
+    <h2>景点详情卡片</h2>
+    <p>ATTRACTIONS</p>
+  </div>
+  <div class="attractions" id="attractions"></div>
+</section>
+
+<section id="photos">
+  <div class="section-head">
+    <h2>我的相册</h2>
+    <p>PERSONAL SCREENSHOTS · 来自原始攻略表</p>
+  </div>
+  <div class="my-photos" id="my-photos"></div>
+</section>
+
+<section id="tips">
+  <div class="section-head">
+    <h2>攻略 Tips & 票价</h2>
+    <p>USEFUL TIPS</p>
+  </div>
+  <div class="tips-grid" id="tips-grid"></div>
+</section>
+
+<footer>
+  <div class="hand">— 旅は道連れ、世は情け —</div>
+  Made with 🌸 by Len · 2024
+</footer>
+
+<script src="data.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const D = window.GUIDE_DATA;
+  document.title = "春节东京攻略 · 樱花粉彩";
+  document.getElementById('date-range').textContent = D.meta.dateRange;
+  document.getElementById('travelers').textContent = D.meta.travelers;
+
+  // 樱花飘落
+  const petalBox = document.getElementById('petals');
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (8 + Math.random() * 8) + 's';
+    p.style.animationDelay = -Math.random() * 10 + 's';
+    p.style.transform = `scale(${.5 + Math.random()})`;
+    petalBox.appendChild(p);
+  }
+
+  // 行程
+  const tl = document.getElementById('timeline');
+  D.days.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    card.innerHTML = `
+      <div class="day-head">
+        <div>
+          <div class="day-date">DAY ${d.idx} · ${d.date}</div>
+          <div class="day-title">${d.title}<span class="day-lunar">${d.lunar}</span></div>
+          <div class="day-city">📍 ${d.city}</div>
+        </div>
+        <div class="day-emoji">${d.emoji}</div>
+      </div>
+      <div class="blocks">
+        ${d.blocks.map(b => `
+          <div class="block">
+            <div class="block-time">${b.time}</div>
+            <div class="block-tag">${b.tag}</div>
+            <div class="block-text">${b.text}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    tl.appendChild(card);
+  });
+
+  // 美食
+  const foodArea = document.getElementById('food-area');
+  Object.entries(D.food).forEach(([area, items]) => {
+    const grid = document.createElement('div');
+    grid.className = 'food-grid';
+    grid.innerHTML = `<div class="food-area-title">${area}</div>` +
+      items.map(f => `
+        <div class="food-card">
+          <div class="food-name">${f.name}</div>
+          <div class="food-area">📍 ${f.area}</div>
+          <div class="food-price">${f.price}</div>
+          <div class="food-note">${f.note}</div>
+          ${f.url ? `<a href="${f.url}" target="_blank" class="food-link">查看地图 →</a>` : ''}
+        </div>
+      `).join('');
+    foodArea.appendChild(grid);
+  });
+
+  // 景点
+  const attr = document.getElementById('attractions');
+  D.attractions.forEach(a => {
+    const card = document.createElement('div');
+    card.className = 'attr-card';
+    const photoBg = a.gradient || 'linear-gradient(135deg,var(--pink-soft),var(--pink))';
+    card.innerHTML = `
+      <div class="attr-photo" style="background:${photoBg}">
+        ${a.image ? `<img src="${a.image}" alt="${a.name}" loading="lazy" onerror="this.style.display='none'">` : ''}
+      </div>
+      <div class="attr-card-body">
+        <div class="attr-head">
+          <div class="attr-name">${a.name}</div>
+          <div class="attr-tag">${a.tag}</div>
+        </div>
+        <div class="attr-meta">
+          <span>🕐 ${a.hours}</span>
+          <span>💴 ${a.price}</span>
+        </div>
+        <div class="attr-desc">${a.desc}</div>
+        <ul class="attr-tips">
+          ${a.tips.map(t => `<li>${t}</li>`).join('')}
+        </ul>
+        ${a.url ? `<a href="${a.url}" target="_blank" class="attr-link">官方链接 →</a>` : ''}
+        <a href="https://www.google.com/maps/search/?api=1&query=${a.lat},${a.lng}" target="_blank" class="attr-link">📍 在 Google Maps 打开</a>
+      </div>
+    `;
+    attr.appendChild(card);
+  });
+
+  // 个人相册
+  const mp = document.getElementById('my-photos');
+  D.myPhotos.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'my-photo';
+    div.dataset.cap = p.caption;
+    div.innerHTML = `<img src="${p.src}" alt="${p.caption}" loading="lazy" onerror="this.parentElement.style.display='none'">`;
+    mp.appendChild(div);
+  });
+
+  // Leaflet 地图
+  const map = L.map('leaflet-map', { scrollWheelZoom: false }).setView([35.68, 139.78], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  const pinkIcon = L.divIcon({
+    className: '', iconSize: [22,22], iconAnchor: [11,11],
+    html: `<div style="width:18px;height:18px;border-radius:50%;background:#ff8aab;border:3px solid #fff;box-shadow:0 0 0 2px rgba(255,138,171,.5)"></div>`
+  });
+  const goldIcon = L.divIcon({
+    className: '', iconSize: [16,16], iconAnchor: [8,8],
+    html: `<div style="width:12px;height:12px;border-radius:50%;background:#d4a574;border:2px solid #fff;box-shadow:0 0 0 1px rgba(212,165,116,.6)"></div>`
+  });
+
+  const bounds = [];
+  D.attractions.forEach(a => {
+    if (a.lat && a.lng) {
+      L.marker([a.lat, a.lng], {icon: pinkIcon})
+        .bindPopup(`<b>${a.name}</b><br><small>🏷️ ${a.tag} · 🕐 ${a.hours} · 💴 ${a.price}</small><br><a href="https://www.google.com/maps/search/?api=1&query=${a.lat},${a.lng}" target="_blank">在 Google Maps 打开 →</a>`)
+        .addTo(map);
+      bounds.push([a.lat, a.lng]);
+    }
+  });
+  Object.entries(D.food).forEach(([area, items]) => {
+    items.forEach(f => {
+      if (f.lat && f.lng) {
+        L.marker([f.lat, f.lng], {icon: goldIcon})
+          .bindPopup(`<b>${f.name}</b><br><small>${area} · ${f.price}</small><br>${f.note}<br><a href="https://www.google.com/maps/search/?api=1&query=${f.lat},${f.lng}" target="_blank">导航 →</a>`)
+          .addTo(map);
+        bounds.push([f.lat, f.lng]);
+      }
+    });
+  });
+  if (bounds.length) map.fitBounds(bounds, { padding: [40,40] });
+
+  // Tips
+  const tg = document.getElementById('tips-grid');
+  D.tips.forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'tip';
+    div.innerHTML = `
+      <div class="tip-icon">${t.icon}</div>
+      <div class="tip-title">${t.title}</div>
+      <div class="tip-text">${t.text}</div>
+    `;
+    tg.appendChild(div);
+  });
+</script>
+</body>
+</html>

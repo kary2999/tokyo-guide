@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>春节东京攻略 · 手账风</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Kalam:wght@300;400;700&family=Noto+Sans+SC:wght@400;500;700&family=Shadows+Into+Light&family=Patrick+Hand&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root {
+    --paper: #fffaf0;
+    --grid: #c9d8e8;
+    --tape-1: #ffd8a8;
+    --tape-2: #b9e3c6;
+    --tape-3: #f8c8d6;
+    --tape-4: #c8d6f8;
+    --pen: #2a3a52;
+    --pen-soft: #6a7c95;
+    --red: #e74c3c;
+    --orange: #f39c12;
+    --green: #27ae60;
+    --blue: #3498db;
+    --pink: #e91e63;
+    --yellow: #fff7c0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    color: var(--pen);
+    font-family: "Patrick Hand", "Kalam", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+    background: var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: -1px -1px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  .hand { font-family: "Caveat", "Shadows Into Light", cursive; }
+  .scribble { font-family: "Shadows Into Light", cursive; }
+
+  /* 顶部 */
+  header.cover {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+    position: relative;
+  }
+  .header-tape {
+    display: inline-block;
+    background: var(--tape-1);
+    padding: .5rem 3rem;
+    transform: rotate(-2deg);
+    box-shadow: 0 4px 8px rgba(0,0,0,.08);
+    font-family: "Caveat", cursive;
+    font-size: 1.1rem;
+    color: var(--pen);
+    letter-spacing: .2em;
+    opacity: .9;
+  }
+  .header-tape::before, .header-tape::after {
+    content: ""; display: inline-block; width: 8px; height: 8px;
+    background: rgba(0,0,0,.06); border-radius: 50%; margin: 0 .8rem;
+    vertical-align: middle;
+  }
+  header.cover h1 {
+    font-family: "Caveat", cursive;
+    font-weight: 700;
+    font-size: clamp(3.5rem, 9vw, 6rem);
+    color: var(--pen);
+    margin: 1rem 0 .3rem;
+    transform: rotate(-1deg);
+    text-shadow: 3px 3px 0 var(--yellow);
+  }
+  header.cover .sub {
+    font-family: "Shadows Into Light", cursive;
+    font-size: 1.4rem;
+    color: var(--pen-soft);
+    margin-bottom: 1.5rem;
+  }
+  .info-board {
+    display: inline-flex; flex-wrap: wrap; gap: 1rem;
+    background: var(--yellow);
+    border: 2px dashed var(--pen);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 4px 4px 0 var(--pen-soft);
+    transform: rotate(.5deg);
+    font-family: "Patrick Hand", cursive;
+    font-size: 1.05rem;
+  }
+  .info-board span { display: inline-flex; gap: .4rem; align-items: center; }
+
+  /* 浮动贴纸 */
+  .sticker {
+    position: absolute; pointer-events: none; user-select: none;
+    z-index: 0;
+  }
+  .sticker.s1 { top: 80px; left: 5%; transform: rotate(-15deg); font-size: 3rem; }
+  .sticker.s2 { top: 200px; right: 8%; transform: rotate(20deg); font-size: 3.5rem; }
+
+  /* 导航 */
+  nav.tabs {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; justify-content: center; gap: .5rem; flex-wrap: wrap;
+    padding: 1rem; backdrop-filter: blur(8px);
+    background: rgba(255,250,240,.85);
+    border-bottom: 2px dashed var(--pen-soft);
+  }
+  nav.tabs a {
+    color: var(--pen); text-decoration: none;
+    padding: .35rem 1rem; border-radius: 999px;
+    font-size: 1rem; font-family: "Patrick Hand", cursive;
+    border: 2px solid transparent;
+    transition: all .2s;
+  }
+  nav.tabs a:nth-child(1):hover { background: var(--tape-3); border-color: var(--pen); }
+  nav.tabs a:nth-child(2):hover { background: var(--tape-1); border-color: var(--pen); }
+  nav.tabs a:nth-child(3):hover { background: var(--tape-2); border-color: var(--pen); }
+  nav.tabs a:nth-child(4):hover { background: var(--tape-4); border-color: var(--pen); }
+
+  section { max-width: 1200px; margin: 0 auto; padding: 3.5rem 1.5rem; position: relative; }
+  .sec-title {
+    text-align: center; margin-bottom: 3rem;
+  }
+  .sec-title h2 {
+    font-family: "Caveat", cursive; font-size: 3rem; font-weight: 700;
+    color: var(--pen); display: inline-block; position: relative;
+    padding: 0 1rem;
+  }
+  .sec-title h2::before {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 4px; height: 12px;
+    background: var(--yellow); z-index: -1; transform: skew(-2deg);
+  }
+  .sec-title .num {
+    display: block; font-family: "Shadows Into Light", cursive;
+    color: var(--pen-soft); font-size: 1.1rem; letter-spacing: .3em;
+  }
+
+  /* 行程 - 双列卡片像贴纸 */
+  .days {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 2.5rem 2rem;
+  }
+  .day-page {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 4px 4px 0 var(--pen-soft);
+    padding: 1.6rem 1.4rem 1.4rem;
+    position: relative;
+    transition: transform .25s;
+  }
+  .day-page:nth-child(2n) { transform: rotate(.6deg); }
+  .day-page:nth-child(3n) { transform: rotate(-.6deg); }
+  .day-page:hover { transform: rotate(0) translateY(-3px); }
+  .day-page::before {
+    content: "";
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%) rotate(-3deg);
+    width: 130px; height: 26px;
+    background: var(--tape-3); opacity: .85;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  }
+  .day-page:nth-child(2n)::before { background: var(--tape-1); }
+  .day-page:nth-child(3n)::before { background: var(--tape-2); }
+  .day-page:nth-child(4n)::before { background: var(--tape-4); }
+
+  .day-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: .8rem;
+  }
+  .day-page h3 {
+    font-family: "Caveat", cursive; font-size: 1.8rem;
+    color: var(--pen); line-height: 1.2;
+  }
+  .day-page .day-date {
+    font-family: "Shadows Into Light", cursive; font-size: 1.1rem;
+    color: var(--red);
+  }
+  .day-page .day-emoji { font-size: 2.5rem; line-height: 1; }
+  .day-meta {
+    display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1rem;
+  }
+  .pill {
+    display: inline-block; padding: .15rem .8rem;
+    border-radius: 999px; font-size: .9rem;
+    border: 1.5px solid var(--pen);
+    font-family: "Patrick Hand", cursive;
+  }
+  .pill.lunar { background: var(--tape-3); }
+  .pill.city { background: var(--tape-2); }
+
+  .day-blocks { border-top: 1.5px dashed var(--pen-soft); padding-top: .8rem; }
+  .jblock {
+    display: grid; grid-template-columns: 70px 60px 1fr; gap: .5rem;
+    padding: .5rem 0;
+    align-items: start;
+    border-bottom: 1px dotted #e0e0e0;
+  }
+  .jblock:last-child { border-bottom: 0; }
+  .jblock-time {
+    font-family: "Caveat", cursive; font-weight: 700;
+    color: var(--red); font-size: 1.05rem;
+  }
+  .jblock-tag {
+    font-size: .75rem; padding: .15rem .4rem;
+    border: 1px solid var(--pen); border-radius: 4px;
+    text-align: center; align-self: center;
+    background: var(--yellow);
+    font-family: "Patrick Hand", cursive;
+  }
+  .jblock-text { font-size: .95rem; line-height: 1.55; color: var(--pen); }
+  .check { color: var(--green); }
+
+  /* 美食 - 便签贴纸 */
+  .food-section { margin-bottom: 3rem; }
+  .food-area-label {
+    display: inline-block; font-family: "Caveat", cursive;
+    font-size: 1.6rem; font-weight: 700;
+    background: var(--yellow); padding: .2rem 1rem;
+    transform: rotate(-1deg);
+    border-left: 6px solid var(--orange);
+    margin-bottom: 1.3rem;
+  }
+  .food-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .sticky-note {
+    background: #fffaaf;
+    padding: 1.2rem 1.2rem 1rem;
+    box-shadow:
+      0 0 1px rgba(0,0,0,.1),
+      4px 8px 12px rgba(0,0,0,.1);
+    position: relative;
+    min-height: 180px;
+    transition: transform .25s;
+  }
+  .sticky-note:nth-child(2n) { background: #b9e3c6; transform: rotate(-1deg); }
+  .sticky-note:nth-child(3n) { background: #ffd8a8; transform: rotate(1.2deg); }
+  .sticky-note:nth-child(4n) { background: #c8d6f8; transform: rotate(-.5deg); }
+  .sticky-note:nth-child(5n) { background: #f8c8d6; transform: rotate(.7deg); }
+  .sticky-note:hover { transform: rotate(0) translateY(-3px); z-index: 2; }
+  .sticky-note h4 {
+    font-family: "Caveat", cursive; font-size: 1.4rem; font-weight: 700;
+    color: var(--pen); margin-bottom: .3rem;
+  }
+  .sticky-note .area { font-size: .85rem; color: var(--pen-soft); }
+  .sticky-note .price {
+    display: inline-block; background: var(--pen); color: #fff;
+    padding: .1rem .6rem; border-radius: 4px;
+    font-family: "Patrick Hand", cursive; font-size: .85rem;
+    margin: .5rem 0;
+  }
+  .sticky-note p { font-size: .92rem; line-height: 1.55; }
+  .sticky-note a {
+    display: inline-block; margin-top: .5rem;
+    color: var(--blue); text-decoration: none;
+    font-family: "Caveat", cursive; font-size: 1.05rem;
+    border-bottom: 2px wavy var(--blue);
+  }
+
+  /* 地图 */
+  #leaflet-map {
+    height: 480px;
+    border: 4px solid #fff;
+    box-shadow:
+      0 0 0 2px var(--pen),
+      6px 6px 0 var(--pen-soft);
+    border-radius: 4px;
+  }
+  .leaflet-popup-content-wrapper {
+    background: #fffaaf;
+    border-radius: 6px;
+    box-shadow: 4px 4px 0 var(--pen-soft);
+    font-family: "Patrick Hand", cursive;
+  }
+  .leaflet-popup-content { margin: .8rem 1rem; line-height: 1.6; color: var(--pen); }
+  .leaflet-popup-content b { font-family: "Caveat", cursive; font-size: 1.2rem; color: var(--red); }
+  .leaflet-popup-tip { background: #fffaaf; }
+  .map-legend {
+    text-align: center; margin-top: 1rem;
+    font-family: "Patrick Hand", cursive; font-size: 1rem;
+  }
+  .map-legend span { margin: 0 .8rem; }
+  .map-legend .dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--red); border: 2px solid var(--pen); margin-right: .3rem; vertical-align: middle; }
+  .map-legend .dot.food { background: var(--orange); }
+
+  /* 景点 - 拍立得 */
+  .polaroid-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 2rem;
+  }
+  .polaroid {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    padding: 1.2rem 1.2rem 1.5rem;
+    box-shadow:
+      0 0 1px rgba(0,0,0,.15),
+      6px 8px 18px rgba(0,0,0,.12);
+    position: relative;
+    transition: transform .3s;
+  }
+  .polaroid:nth-child(odd) { transform: rotate(-1deg); }
+  .polaroid:nth-child(even) { transform: rotate(1deg); }
+  .polaroid:hover { transform: rotate(0) translateY(-4px); z-index: 2; }
+  .polaroid::before {
+    content: ""; position: absolute; top: -10px; left: 30%;
+    width: 80px; height: 22px;
+    background: rgba(255,200,150,.55);
+    transform: rotate(-2deg);
+  }
+  .polaroid-photo {
+    height: 180px;
+    background-size: cover; background-position: center;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    overflow: hidden;
+    position: relative;
+  }
+  .polaroid-photo img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .polaroid h3 {
+    font-family: "Caveat", cursive; font-size: 1.6rem;
+    color: var(--pen); display: flex; justify-content: space-between; align-items: center;
+  }
+  .polaroid .tag {
+    font-family: "Patrick Hand", cursive; font-size: .8rem;
+    background: var(--red); color: #fff;
+    padding: .1rem .6rem; border-radius: 4px;
+  }
+  .polaroid .info-row {
+    display: flex; gap: 1rem; margin: .4rem 0;
+    font-family: "Patrick Hand", cursive; font-size: .9rem; color: var(--pen-soft);
+  }
+  .polaroid .info-row span::before { margin-right: .2rem; }
+  .polaroid p { font-size: .9rem; line-height: 1.6; margin: .4rem 0; }
+  .polaroid ul {
+    list-style: none; border-top: 1px dashed #d0d0d0;
+    padding-top: .5rem; margin-top: .6rem;
+  }
+  .polaroid ul li {
+    font-size: .85rem; line-height: 1.6;
+    padding-left: 1.4rem; position: relative;
+  }
+  .polaroid ul li::before {
+    content: "☐"; position: absolute; left: 0; color: var(--pen);
+  }
+  .polaroid ul li:nth-child(2)::before { content: "☑"; color: var(--green); }
+  .polaroid a {
+    display: inline-block; margin-top: .5rem;
+    color: var(--blue); font-family: "Caveat", cursive;
+    font-size: 1.05rem; text-decoration: underline wavy;
+  }
+
+  /* 个人相册 */
+  .my-photos {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+  }
+  .my-photo {
+    aspect-ratio: 4/3;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    padding: .8rem .8rem 1.5rem;
+    box-shadow: 4px 6px 12px rgba(0,0,0,.1);
+    transition: transform .25s;
+    overflow: hidden;
+    position: relative;
+  }
+  .my-photo:nth-child(odd) { transform: rotate(-1.5deg); }
+  .my-photo:nth-child(even) { transform: rotate(1.5deg); }
+  .my-photo:hover { transform: rotate(0) translateY(-4px); z-index: 2; }
+  .my-photo::before {
+    content: ""; position: absolute; top: -8px; left: 35%;
+    width: 60px; height: 18px;
+    background: rgba(255,200,150,.5); transform: rotate(-2deg);
+  }
+  .my-photo img {
+    width: 100%; height: calc(100% - 24px); object-fit: cover; display: block;
+  }
+  .my-photo small {
+    position: absolute; left: 0; right: 0; bottom: 4px;
+    text-align: center; font-family: "Caveat", cursive;
+    font-size: 1rem; color: var(--pen-soft);
+  }
+
+  /* Tips - 待办列表 */
+  .tips-board {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 2rem;
+    box-shadow: 4px 4px 0 var(--pen-soft);
+    position: relative;
+  }
+  .tips-board::before {
+    content: ""; position: absolute; top: -12px; left: 40px;
+    width: 120px; height: 24px;
+    background: var(--tape-1); transform: rotate(-3deg);
+    opacity: .9;
+  }
+  .tips-board::after {
+    content: ""; position: absolute; top: -12px; right: 40px;
+    width: 120px; height: 24px;
+    background: var(--tape-2); transform: rotate(2deg);
+    opacity: .9;
+  }
+  .tips-board h3 {
+    font-family: "Caveat", cursive; font-size: 1.8rem;
+    text-align: center; margin-bottom: 1.5rem;
+    color: var(--pen);
+  }
+  .tips-list {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+  }
+  .tip-row {
+    display: flex; gap: .8rem;
+    padding: .8rem; border-bottom: 1px dashed #e0e0e0;
+    align-items: flex-start;
+  }
+  .tip-icon {
+    font-size: 1.6rem; line-height: 1; flex-shrink: 0;
+  }
+  .tip-content h4 {
+    font-family: "Caveat", cursive; font-size: 1.25rem;
+    color: var(--pen); font-weight: 700;
+  }
+  .tip-content p { font-size: .87rem; line-height: 1.6; color: var(--pen-soft); }
+
+  footer {
+    text-align: center; padding: 4rem 1rem;
+    color: var(--pen-soft);
+  }
+  footer .heart { color: var(--red); }
+  footer .signature {
+    font-family: "Caveat", cursive; font-size: 2rem;
+    color: var(--pen); margin: .5rem 0;
+  }
+
+  @media (max-width: 600px) {
+    body { background-size: 18px 18px; }
+    .sticker { display: none; }
+    nav.tabs { gap: .2rem; padding: .6rem; }
+    nav.tabs a { font-size: .9rem; padding: .25rem .7rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="cover">
+  <div class="sticker s1">🌸</div>
+  <div class="sticker s2">✈️</div>
+  <div class="header-tape">My Travel Journal</div>
+  <h1>春节东京 9 日</h1>
+  <div class="sub">~ a journey to remember ~</div>
+  <div class="info-board">
+    <span>📅 <span id="date-range"></span></span>
+    <span>👥 <span id="travelers"></span></span>
+    <span>📍 东京·大阪·镰仓·富士</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <a href="#map">🗺️ 地图</a>
+  <a href="#days">📔 行程</a>
+  <a href="#food">🍣 美食</a>
+  <a href="#attractions">📸 景点</a>
+  <a href="#photos">📷 相册</a>
+  <a href="#tips">✅ Tips</a>
+  <a href="gallery.html">🎨 切换风格</a>
+</nav>
+
+<section id="map">
+  <div class="sec-title">
+    <span class="num">CHAPTER 00</span>
+    <h2>地图总览</h2>
+  </div>
+  <div id="leaflet-map"></div>
+  <div class="map-legend">
+    <span><i class="dot"></i>景点 13 个</span>
+    <span><i class="dot food"></i>美食 24 家</span>
+  </div>
+</section>
+
+<section id="days">
+  <div class="sec-title">
+    <span class="num">CHAPTER 01</span>
+    <h2>9 天行程时间轴</h2>
+  </div>
+  <div class="days" id="days-list"></div>
+</section>
+
+<section id="food">
+  <div class="sec-title">
+    <span class="num">CHAPTER 02</span>
+    <h2>美食地图清单</h2>
+  </div>
+  <div id="food-area"></div>
+</section>
+
+<section id="attractions">
+  <div class="sec-title">
+    <span class="num">CHAPTER 03</span>
+    <h2>景点拍立得卡</h2>
+  </div>
+  <div class="polaroid-grid" id="polaroid-grid"></div>
+</section>
+
+<section id="photos">
+  <div class="sec-title">
+    <span class="num">CHAPTER 04</span>
+    <h2>我的相册</h2>
+  </div>
+  <div class="my-photos" id="my-photos"></div>
+</section>
+
+<section id="tips">
+  <div class="sec-title">
+    <span class="num">CHAPTER 05</span>
+    <h2>攻略 Tips & 票价</h2>
+  </div>
+  <div class="tips-board">
+    <h3>✏️ Travel Notes</h3>
+    <div class="tips-list" id="tips-list"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="signature">— Len's Tokyo Trip —</div>
+  Made with <span class="heart">♥</span> · 2024 春节
+</footer>
+
+<script src="data.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const D = window.GUIDE_DATA;
+  document.getElementById('date-range').textContent = D.meta.dateRange;
+  document.getElementById('travelers').textContent = D.meta.travelers;
+
+  const emojiPool = ["🗼","🌸","🍣","🚄","🎢","⛩️","🗻","🛍️","🏯","🍜"];
+
+  // 行程
+  const days = document.getElementById('days-list');
+  D.days.forEach((d, i) => {
+    const card = document.createElement('div');
+    card.className = 'day-page';
+    card.innerHTML = `
+      <div class="day-head">
+        <div>
+          <div class="day-date">DAY ${d.idx} / ${d.date}</div>
+          <h3>${d.title}</h3>
+        </div>
+        <div class="day-emoji">${d.emoji}</div>
+      </div>
+      <div class="day-meta">
+        <span class="pill lunar">${d.lunar}</span>
+        <span class="pill city">📍 ${d.city}</span>
+      </div>
+      <div class="day-blocks">
+        ${d.blocks.map(b => `
+          <div class="jblock">
+            <div class="jblock-time">${b.time}</div>
+            <div class="jblock-tag">${b.tag}</div>
+            <div class="jblock-text">${b.text}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    days.appendChild(card);
+  });
+
+  // 美食
+  const foodArea = document.getElementById('food-area');
+  Object.entries(D.food).forEach(([area, items]) => {
+    const sec = document.createElement('div');
+    sec.className = 'food-section';
+    sec.innerHTML = `
+      <div class="food-area-label">${area}</div>
+      <div class="food-grid">
+        ${items.map(f => `
+          <div class="sticky-note">
+            <h4>${f.name}</h4>
+            <div class="area">📍 ${f.area}</div>
+            <div class="price">${f.price}</div>
+            <p>${f.note}</p>
+            ${f.url ? `<a href="${f.url}" target="_blank">→ 看地图</a>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    `;
+    foodArea.appendChild(sec);
+  });
+
+  // 景点
+  const pg = document.getElementById('polaroid-grid');
+  D.attractions.forEach((a, i) => {
+    const card = document.createElement('div');
+    card.className = 'polaroid';
+    card.innerHTML = `
+      <div class="polaroid-photo" style="background:${a.gradient || 'linear-gradient(135deg, var(--tape-2), var(--tape-4))'}">
+        ${a.image ? `<img src="${a.image}" alt="${a.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.innerHTML='${emojiPool[i % emojiPool.length]}'">` : emojiPool[i % emojiPool.length]}
+      </div>
+      <h3>${a.name} <span class="tag">${a.tag}</span></h3>
+      <div class="info-row">
+        <span>🕐 ${a.hours}</span>
+        <span>💴 ${a.price}</span>
+      </div>
+      <p>${a.desc}</p>
+      <ul>${a.tips.map(t => `<li>${t}</li>`).join('')}</ul>
+      ${a.url ? `<a href="${a.url}" target="_blank">→ 官方</a>` : ''}
+      <a href="https://www.google.com/maps/search/?api=1&query=${a.lat},${a.lng}" target="_blank" style="margin-left:.6rem">→ 地图</a>
+    `;
+    pg.appendChild(card);
+  });
+
+  // 个人相册
+  const mp = document.getElementById('my-photos');
+  D.myPhotos.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'my-photo';
+    div.innerHTML = `<img src="${p.src}" alt="${p.caption}" loading="lazy" onerror="this.parentElement.style.display='none'"><small>${p.caption}</small>`;
+    mp.appendChild(div);
+  });
+
+  // Leaflet
+  const map = L.map('leaflet-map', { scrollWheelZoom: false }).setView([35.68, 139.78], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  const sightIcon = L.divIcon({
+    className: '', iconSize: [22,22], iconAnchor: [11,11],
+    html: `<div style="width:18px;height:18px;border-radius:50%;background:#e74c3c;border:3px solid #fff;box-shadow:0 0 0 2px #2a3a52"></div>`
+  });
+  const eatIcon = L.divIcon({
+    className: '', iconSize: [16,16], iconAnchor: [8,8],
+    html: `<div style="width:12px;height:12px;border-radius:50%;background:#f39c12;border:2px solid #fff;box-shadow:0 0 0 1px #2a3a52"></div>`
+  });
+
+  const bounds = [];
+  D.attractions.forEach(a => {
+    if (a.lat && a.lng) {
+      L.marker([a.lat, a.lng], {icon: sightIcon})
+        .bindPopup(`<b>${a.name}</b><br>📍 ${a.tag} · 🕐 ${a.hours}<br>💴 ${a.price}<br><a href="https://www.google.com/maps/search/?api=1&query=${a.lat},${a.lng}" target="_blank">→ Google Maps</a>`)
+        .addTo(map);
+      bounds.push([a.lat, a.lng]);
+    }
+  });
+  Object.entries(D.food).forEach(([area, items]) => {
+    items.forEach(f => {
+      if (f.lat && f.lng) {
+        L.marker([f.lat, f.lng], {icon: eatIcon})
+          .bindPopup(`<b>${f.name}</b><br>📍 ${area}<br>${f.note}<br><a href="https://www.google.com/maps/search/?api=1&query=${f.lat},${f.lng}" target="_blank">→ 导航</a>`)
+          .addTo(map);
+        bounds.push([f.lat, f.lng]);
+      }
+    });
+  });
+  if (bounds.length) map.fitBounds(bounds, { padding: [40,40] });
+
+  // Tips
+  const tl = document.getElementById('tips-list');
+  D.tips.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'tip-row';
+    row.innerHTML = `
+      <div class="tip-icon">${t.icon}</div>
+      <div class="tip-content">
+        <h4>${t.title}</h4>
+        <p>${t.text}</p>
+      </div>
+    `;
+    tl.appendChild(row);
+  });
+</script>
+</body>
+</html>
