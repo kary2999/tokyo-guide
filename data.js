@@ -1,9 +1,10 @@
-// 春节东京 9 天攻略数据 · v2
+// 东京 9 天攻略数据 · v3
 // 特性:
 //   1. 日期永远从明天开始(动态计算)
 //   2. 每家店都有 Google Maps 坐标 + 链接
 //   3. Tips 支持 link + address
-//   4. 迪士尼海洋专项穷游攻略 + 玲娜贝儿提示
+//   4. 迪士尼海洋穷游攻略 + 玲娜贝儿 + Fantasy Springs 新区
+//   5. 智能节假日评估(根据当前出行日期判断是否拥挤)
 
 // 工具函数 — 动态计算 9 天日期(明天开始)
 window.GUIDE_HELPERS = {
@@ -32,13 +33,66 @@ window.GUIDE_HELPERS = {
   mapUrl(lat, lng, name) {
     if (name) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
     return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  },
+
+  // 日本节假日日历(MM-DD 格式,跨年用 11-01 → 起始月份大于结束月份的方式表示)
+  // level: 1 = 旺,2 = 高峰,3 = 极高峰
+  holidayCalendar: [
+    { start: "12-29", end: "01-03", level: 3, name: "正月", note: "全国放假,景点/餐厅关门多" },
+    { start: "01-08", end: "01-15", level: 1, name: "成人之日三连休", note: "1月第二个周一前后" },
+    { start: "02-11", end: "02-12", level: 1, name: "建国纪念日", note: "" },
+    { start: "02-23", end: "02-24", level: 1, name: "天皇生日", note: "" },
+    { start: "03-20", end: "04-08", level: 3, name: "樱花季", note: "价格涨 30%+,预订早" },
+    { start: "04-29", end: "04-29", level: 1, name: "昭和之日", note: "" },
+    { start: "04-30", end: "05-06", level: 3, name: "黄金周", note: "酒店价 ×2,人潮汹涌,极不建议" },
+    { start: "07-15", end: "07-21", level: 2, name: "海之日三连休", note: "7月第三个周一" },
+    { start: "07-22", end: "08-31", level: 2, name: "暑假 + 山之日", note: "亲子游高峰" },
+    { start: "08-13", end: "08-16", level: 3, name: "盂兰盆 Obon", note: "全国大移动,新干线满员" },
+    { start: "09-15", end: "09-23", level: 2, name: "敬老日 + 秋分连休", note: "" },
+    { start: "10-08", end: "10-14", level: 1, name: "体育日三连休", note: "10月第二个周一" },
+    { start: "11-03", end: "11-04", level: 1, name: "文化之日", note: "" },
+    { start: "11-15", end: "12-05", level: 2, name: "红叶季", note: "京都/箱根高峰,东京较温和" },
+    { start: "11-23", end: "11-24", level: 1, name: "勤劳感谢日", note: "" },
+    { start: "12-23", end: "12-28", level: 2, name: "圣诞 + 跨年前", note: "市内景点价格上浮" }
+  ],
+
+  // 检查某天是否落在某个节假日范围内
+  inHoliday(date, period) {
+    const md = String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+    if (period.start <= period.end) return md >= period.start && md <= period.end;
+    return md >= period.start || md <= period.end;
+  },
+
+  // 综合评估 9 天行程
+  assessTrip(tripDates) {
+    const hits = [];
+    let maxLevel = 0;
+    tripDates.forEach((d, i) => {
+      this.holidayCalendar.forEach(p => {
+        if (this.inHoliday(d, p)) {
+          hits.push({ dayIdx: i + 1, date: this.fmt(d), period: p });
+          if (p.level > maxLevel) maxLevel = p.level;
+        }
+      });
+    });
+    let verdict;
+    if (maxLevel === 0) {
+      verdict = { score: 'green', emoji: '🟢', label: '平峰期 · 适合出行', detail: '未撞日本节假日,机票酒店价格友好,景点人少。强烈推荐。' };
+    } else if (maxLevel === 1) {
+      verdict = { score: 'green', emoji: '🟢', label: '准平峰 · 仍适合', detail: '只撞到小型公休日,影响有限。提前订住宿即可。' };
+    } else if (maxLevel === 2) {
+      verdict = { score: 'orange', emoji: '🟠', label: '高峰期 · 谨慎', detail: '撞日本节假日/旺季,酒店价上浮 30–50%,景点人较多。需提前 1 个月预订。' };
+    } else {
+      verdict = { score: 'red', emoji: '🔴', label: '极高峰 · 不建议', detail: '撞日本国民大假(黄金周/正月/盂兰盆),酒店价翻倍、新干线满员、景点人挤人。除非已订好,建议错峰。' };
+    }
+    return { verdict, hits, maxLevel };
   }
 };
 
 window.GUIDE_DATA = {
   meta: {
-    title: "春节东京 9 日攻略",
-    subtitle: "Tokyo Spring Festival Travel Guide",
+    title: "东京 9 日攻略",
+    subtitle: "Tokyo Travel Guide",
     travelers: "2 人 / 9 天 8 晚"
     // dateRange 由 helpers.tripDates() 动态生成
   },
@@ -430,23 +484,83 @@ window.GUIDE_DATA = {
     title: "迪士尼海洋穷游攻略",
     subtitle: "8:20 入场到 21:00 烟花的全天路线",
     intro: "9 天行程里最贵也最值的一天。门票 ¥8,400 起、DPA 单项 ¥1,500–2,500、餐饮 ¥3,000+,但用对方法可以从'人均 ¥1,800/小时'变成'¥800/小时'。下面是经过实战验证的 5 个模块。",
+
+    // 园区分区 — 用 SVG 渲染,坐标对应一张概念图(0-100% 网格)
+    // 2024 年 Fantasy Springs 开园后共 8 大主题区
+    parkZones: [
+      { id: "med",   name: "地中海港湾",       en: "Mediterranean Harbor", x: 50, y: 78, color: "#d8a86a", emoji: "🏰", note: "入口区 + 烟花/夜场最佳观赏点" },
+      { id: "amer",  name: "美国海滨",         en: "American Waterfront",  x: 22, y: 62, color: "#c87575", emoji: "🚢", note: "翱翔梦幻奇航 Soaring 在这里" },
+      { id: "port",  name: "发现港",           en: "Port Discovery",       x: 28, y: 38, color: "#5e9dd6", emoji: "⚓", note: "尼莫与他的好朋友" },
+      { id: "lost",  name: "失落河三角洲",     en: "Lost River Delta",     x: 50, y: 30, color: "#7a8c5a", emoji: "🐍", note: "印第安纳琼斯·愤怒双神" },
+      { id: "arab",  name: "阿拉伯海岸",       en: "Arabian Coast",        x: 70, y: 38, color: "#c8923a", emoji: "🕌", note: "辛巴达 / 神灯剧场" },
+      { id: "merm",  name: "美人鱼礁湖",       en: "Mermaid Lagoon",       x: 76, y: 60, color: "#d486b0", emoji: "🧜", note: "海底两万里 + 室内场馆,雨天首选" },
+      { id: "myst",  name: "神秘岛",           en: "Mysterious Island",    x: 50, y: 56, color: "#6a6a7a", emoji: "🌋", note: "地心探险 + 火山(烟花参照点)" },
+      { id: "fant",  name: "范达海",           en: "Fantasy Springs",      x: 84, y: 22, color: "#7e57c2", emoji: "❄️", note: "2024.06.06 新开!冰雪/彼得潘/长发公主三主题" }
+    ],
+
+    // 项目最新动态 / 新闻
+    news: [
+      {
+        date: "2024.06.06",
+        tag: "🆕 重大更新",
+        title: "Fantasy Springs 范达海主题区开园",
+        text: "DisneySea 第 8 个主题区,投资 3,200 亿日元,含三大主题:Anna and Elsa's Frozen Journey(冰雪奇缘)、Peter Pan's Never Land Adventure(彼得潘)、Rapunzel's Lantern Festival(长发公主)。**整区入园需要 Premier Access(¥2,000 起)或 Standby Pass**,不能裸入。",
+        url: "https://www.tokyodisneyresort.jp/treasure/fantasysprings/",
+        urgent: true
+      },
+      {
+        date: "2024 起",
+        tag: "🎫 票务变化",
+        title: "DPA 完全取代 FastPass",
+        text: "迪士尼海洋已废除免费 FastPass,所有快速通道改为 Disney Premier Access(DPA),单项 ¥1,500–¥2,500 不等,一天可买多项。APP 内购买,APP 内显示时段。冷门项目仍可用免费的 Standby Pass(入场卡)。"
+      },
+      {
+        date: "持续中",
+        tag: "🎀 玲娜贝儿",
+        title: "LinaBell 周边持续更新",
+        text: "玲娜贝儿(LinaBell)2021 年于上海首发,东京迪士尼海洋为东半球第二个、也是全球除上海外唯一在售的乐园。每季度有新主题款,毛绒玩偶常断货,周末易售罄。开门后建议先抢热门项目卡再去美人鱼礁湖商店购买。"
+      },
+      {
+        date: "2024 起",
+        tag: "📱 APP 必装",
+        title: "Tokyo Disney Resort APP 全功能化",
+        text: "园区地图、抢卡、DPA 购买、餐厅预约、表演时刻、停车位查询,全部集成到一个 APP。**需日区 Apple ID** 才能下载;Android 直接 Google Play 即可。"
+      },
+      {
+        date: "2025 起",
+        tag: "🚇 交通",
+        title: "迪士尼度假区单轨电车更新",
+        text: "Disney Resort Line(迪士尼度假区线)单程 ¥260,1 日券 ¥660。从舞滨站出来即可换乘;新款列车导入。对于跨园区(乐园 ↔ 海洋)非常方便。"
+      },
+      {
+        date: "高峰季",
+        tag: "💴 票价浮动",
+        title: "门票动态定价",
+        text: "2024 年起官方采用动态定价:¥8,400(平日)/ ¥8,900(周末)/ ¥9,400(高峰)。圣诞、樱花季、暑假门票最贵。提前在飞猪/官网购买锁价。"
+      }
+    ],
+
     sections: [
       {
         icon: "⏰", title: "黄金时刻表 · 时间就是钱",
         items: [
-          { time: "05:51", what: "京叶线坐到东京站", note: "第一班车,¥230" },
-          { time: "06:07", what: "东京站 → 舞滨站", note: "京叶线 11 分钟" },
-          { time: "06:25", what: "步行 15 分钟到正门", note: "出站后跟人流即可" },
-          { time: "08:20", what: "实际开门(官方 8:30)", note: "度假村酒店住客再早 15 min" },
-          { time: "08:30", what: "立刻抢入场卡 + APP DPA", note: "翱翔梦幻奇航、美人鱼、印第安纳琼斯优先" },
-          { time: "09:00", what: "首发人气项目", note: "刚入园人最多,直冲入口" },
-          { time: "11:30", what: "水上花车第 1 场", note: "找好位子提前 30 min" },
-          { time: "12:00", what: "红色项目 DPA、橘色入场卡", note: "开抢下午的约" },
-          { time: "14:05", what: "水上花车第 2 场", note: "也可改逛美国海滨" },
-          { time: "16:05", what: "水上花车第 3 场", note: "" },
-          { time: "18:35", what: "动感大乐团", note: "码头湖畔的 LIVE" },
-          { time: "19:20", what: "梦之海", note: "夜间灯光秀" },
-          { time: "20:30", what: "压轴烟花秀", note: "日落后最佳位置:火山附近" }
+          { time: "05:51", what: "京叶线坐到东京站", note: "第一班车,¥230", zone: "出发", img: "https://images.unsplash.com/photo-1542931287-023b922fa89b?w=400&q=70&auto=format&fit=crop" },
+          { time: "06:07", what: "东京站 → 舞滨站", note: "京叶线 11 分钟", zone: "出发", img: "https://images.unsplash.com/photo-1554797589-7241bb691973?w=400&q=70&auto=format&fit=crop" },
+          { time: "06:25", what: "步行 15 分钟到正门", note: "出站后跟人流即可", zone: "正门", img: "https://images.unsplash.com/photo-1624601573012-efb68931cc8f?w=400&q=70&auto=format&fit=crop" },
+          { time: "08:20", what: "实际开门(官方 8:30)", note: "度假村酒店住客再早 15 min", zone: "地中海港湾", img: "https://images.unsplash.com/photo-1604973103069-fbf9bd2f3aa1?w=400&q=70&auto=format&fit=crop" },
+          { time: "08:30", what: "立刻抢入场卡 + APP DPA", note: "翱翔梦幻奇航、美人鱼、印第安纳琼斯优先", zone: "全园", img: "https://images.unsplash.com/photo-1556139943-4bdca53adf1e?w=400&q=70&auto=format&fit=crop" },
+          { time: "09:00", what: "翱翔梦幻奇航 Soaring", note: "首选,5D 飞行模拟,刚入园人最多", zone: "美国海滨", img: "https://images.unsplash.com/photo-1562088287-bde35a1ea917?w=400&q=70&auto=format&fit=crop" },
+          { time: "10:00", what: "海底两万里", note: "美人鱼礁湖经典", zone: "美人鱼礁湖", img: "https://images.unsplash.com/photo-1580674684081-7617fbf3d745?w=400&q=70&auto=format&fit=crop" },
+          { time: "11:30", what: "水上花车第 1 场", note: "找好位子提前 30 min", zone: "地中海港湾", img: "https://images.unsplash.com/photo-1503001683924-2f5dee99af6a?w=400&q=70&auto=format&fit=crop" },
+          { time: "12:00", what: "红色项目 DPA、橘色入场卡", note: "开抢下午的约", zone: "全园", img: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&q=70&auto=format&fit=crop" },
+          { time: "13:00", what: "印第安纳琼斯过山车", note: "1 分半,愤怒双神,刺激", zone: "失落河三角洲", img: "https://images.unsplash.com/photo-1551884170-09fb70a3a2ed?w=400&q=70&auto=format&fit=crop" },
+          { time: "14:05", what: "水上花车第 2 场", note: "也可改逛美国海滨", zone: "地中海港湾", img: "https://images.unsplash.com/photo-1604971808832-e6a92d9c4c54?w=400&q=70&auto=format&fit=crop" },
+          { time: "15:00", what: "辛巴达 / 神灯剧场", note: "排队短的备选", zone: "阿拉伯海岸", img: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=70&auto=format&fit=crop" },
+          { time: "16:05", what: "水上花车第 3 场", note: "下午最后一场", zone: "地中海港湾", img: "https://images.unsplash.com/photo-1490127252417-7c393f993ee4?w=400&q=70&auto=format&fit=crop" },
+          { time: "17:00", what: "Fantasy Springs 范达海(预约)", note: "新区!冰雪 / 彼得潘 / 长发公主主题", zone: "Fantasy Springs", img: "https://images.unsplash.com/photo-1601314002592-b8734bca6604?w=400&q=70&auto=format&fit=crop" },
+          { time: "18:35", what: "动感大乐团", note: "码头湖畔的 LIVE", zone: "地中海港湾", img: "https://images.unsplash.com/photo-1493676304819-0d7a8d026dcf?w=400&q=70&auto=format&fit=crop" },
+          { time: "19:20", what: "梦之海 Believe", note: "夜间水上灯光秀", zone: "地中海港湾", img: "https://images.unsplash.com/photo-1601736015921-eaf1b46a7eea?w=400&q=70&auto=format&fit=crop" },
+          { time: "20:30", what: "压轴烟花秀", note: "最佳位置:火山附近 / 中央湖畔", zone: "地中海港湾", img: "https://images.unsplash.com/photo-1530908295418-a12e326966ba?w=400&q=70&auto=format&fit=crop" }
         ]
       },
       {

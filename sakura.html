@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>春节东京攻略 · 樱花粉彩</title>
+<title>东京 9 日攻略 · 樱花粉彩</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
@@ -87,6 +87,30 @@
   }
   .hero-meta span { display: inline-flex; align-items: center; gap: .4rem; color: var(--ink); }
   .hero-meta b { color: var(--pink-deep); }
+
+  /* 节假日评估 */
+  .assess-card {
+    max-width: 760px; margin: 1.5rem auto 0;
+    background: rgba(255,255,255,.92); backdrop-filter: blur(6px);
+    border-radius: 22px; padding: 1.4rem 1.6rem;
+    box-shadow: var(--shadow);
+    border-left: 6px solid var(--pink);
+    text-align: left;
+  }
+  .assess-card.score-green { border-left-color: #27ae60; }
+  .assess-card.score-orange { border-left-color: #f39c12; }
+  .assess-card.score-red { border-left-color: #e74c3c; }
+  .assess-head { display: flex; align-items: center; gap: .8rem; margin-bottom: .4rem; }
+  .assess-emoji { font-size: 2.2rem; }
+  .assess-title { font-size: 1.3rem; font-weight: 700; color: var(--pink-deep); }
+  .assess-card.score-orange .assess-title { color: #b86a08; }
+  .assess-card.score-red .assess-title { color: #c0392b; }
+  .assess-detail { font-size: .92rem; line-height: 1.65; color: var(--ink); border-top: 1px dashed var(--pink-soft); padding-top: .6rem; margin-top: .4rem; }
+  .assess-hits { margin-top: .6rem; display: flex; flex-direction: column; gap: .35rem; }
+  .assess-hit { display: flex; gap: .5rem; font-size: .85rem; color: var(--ink-soft); align-items: center; }
+  .assess-hit .pill { padding: .15rem .6rem; border-radius: 999px; font-size: .72rem; background: var(--pink-soft); color: var(--pink-deep); font-weight: 600; }
+  .assess-hit .pill.lvl-2 { background: #ffe0c0; color: #b86a08; }
+  .assess-hit .pill.lvl-3 { background: #ffcdd2; color: #c0392b; }
 
   /* 导航 */
   nav.tabs {
@@ -340,6 +364,32 @@
     margin-bottom: .6rem;
   }
   .disney-highlight h4 { font-size: 1.3rem; color: var(--pink-deep); margin-bottom: .8rem; }
+  /* 时刻表配图 */
+  .disney-grid.with-img { grid-template-columns: 100px 88px 1fr; }
+  .disney-grid.with-img .img-cell { width: 80px; height: 60px; border-radius: 10px; overflow: hidden; background: var(--pink-soft); }
+  .disney-grid.with-img .img-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .zone-tag { display: inline-block; background: var(--pink-soft); color: var(--pink-deep); font-size: .72rem; padding: .05rem .5rem; border-radius: 999px; margin-left: .3rem; }
+  /* 园区分区图 */
+  .park-map { background: linear-gradient(135deg,#dceff0,#fff5f7); border-radius: 18px; padding: 1.2rem; margin: 1rem 0; box-shadow: var(--shadow); }
+  .park-map h5 { text-align: center; color: var(--pink-deep); font-size: 1.2rem; margin-bottom: .8rem; }
+  .park-map svg { width: 100%; height: auto; max-height: 380px; display: block; }
+  .park-zone-label { font-family: "Noto Sans SC",system-ui; font-size: 11px; fill: #fff; text-anchor: middle; pointer-events: none; }
+  .park-zone-emoji { font-size: 16px; text-anchor: middle; }
+  .park-legend { display: grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); gap: .4rem .8rem; margin-top: .8rem; font-size: .85rem; }
+  .park-legend-row { display: flex; gap: .4rem; align-items: flex-start; color: var(--ink); }
+  .park-legend-row .dot { width: 10px; height: 10px; border-radius: 50%; margin-top: .35rem; flex-shrink: 0; }
+  /* 新闻 */
+  .news-list { display: flex; flex-direction: column; gap: 1rem; }
+  .news-item { background: #fff; border-left: 4px solid var(--pink); border-radius: 12px; padding: 1rem 1.2rem; box-shadow: var(--shadow); }
+  .news-item.urgent { border-left-color: #e74c3c; }
+  .news-head { display: flex; gap: .6rem; align-items: baseline; flex-wrap: wrap; margin-bottom: .4rem; }
+  .news-head .date { font-size: .8rem; color: var(--ink-soft); }
+  .news-head .tag { background: var(--pink-soft); color: var(--pink-deep); padding: .1rem .6rem; font-size: .8rem; border-radius: 999px; }
+  .news-item.urgent .tag { background: #ffcdd2; color: #c0392b; }
+  .news-head h5 { font-size: 1.1rem; color: var(--pink-deep); flex: 1 1 100%; margin-top: .2rem; }
+  .news-item p { font-size: .9rem; line-height: 1.65; color: var(--ink); }
+  .news-item p strong { color: #c0392b; }
+  .news-item a { display: inline-block; margin-top: .5rem; color: var(--gold); text-decoration: none; border-bottom: 1px dotted var(--gold); font-size: .85rem; }
   .tip {
     background: #fff; border-radius: 18px; padding: 1.3rem;
     box-shadow: var(--shadow); position: relative;
@@ -372,13 +422,14 @@
 <header class="hero">
   <div class="hero-inner">
     <div class="jp-sub jp">桜の季節 · 東京旅行記</div>
-    <h1>春节东京攻略</h1>
+    <h1>东京 9 日攻略</h1>
     <div class="hand" style="font-size:1.8rem;color:var(--pink-deep);margin:.4rem 0 1.5rem">Tokyo · Sakura · 2024</div>
     <div class="hero-meta">
       <span>📅 <b id="date-range"></b></span>
       <span>👥 <b id="travelers"></b></span>
       <span>🗾 <b>东京 · 大阪 · 富士山</b></span>
     </div>
+    <div id="assess-box"></div>
   </div>
 </header>
 
@@ -466,9 +517,29 @@
   const H = window.GUIDE_HELPERS;
   const tripDates = H.tripDates();
   D.meta.dateRange = `${H.fmtFull(tripDates[0])} — ${H.fmtFull(tripDates[8])}`;
-  document.title = "春节东京攻略 · 樱花粉彩";
+  document.title = "东京 9 日攻略 · 樱花粉彩";
   document.getElementById('date-range').textContent = D.meta.dateRange;
   document.getElementById('travelers').textContent = D.meta.travelers;
+
+  // 节假日评估
+  const assess = H.assessTrip(tripDates);
+  const assessBox = document.getElementById('assess-box');
+  if (assessBox) {
+    const seen = new Set();
+    const uniqueHits = assess.hits.filter(h => seen.has(h.period.name) ? false : (seen.add(h.period.name), true));
+    assessBox.innerHTML = `
+      <div class="assess-card score-${assess.verdict.score}">
+        <div class="assess-head">
+          <div class="assess-emoji">${assess.verdict.emoji}</div>
+          <div class="assess-title">${assess.verdict.label}</div>
+        </div>
+        <div class="assess-detail">${assess.verdict.detail}</div>
+        ${uniqueHits.length ? `<div class="assess-hits">
+          ${uniqueHits.map(h => `<div class="assess-hit"><span class="pill lvl-${h.period.level}">Day ${h.dayIdx} · ${h.date}</span><span><b>${h.period.name}</b>${h.period.note ? ' · ' + h.period.note : ''}</span></div>`).join('')}
+        </div>` : `<div class="assess-hits"><div class="assess-hit"><span>✨ 9 天行程未撞日本节假日,价格友好、人流平稳</span></div></div>`}
+      </div>
+    `;
+  }
 
   // 樱花飘落
   const petalBox = document.getElementById('petals');
@@ -628,27 +699,56 @@
   const dg = document.getElementById('disney-guide');
   if (dg && D.disneySeaGuide) {
     const G = D.disneySeaGuide;
-    dg.innerHTML = `
-      <div class="disney-head">
-        <h3>${G.title}</h3>
-        <div class="sub">${G.subtitle}</div>
-        <div class="intro">${G.intro}</div>
-      </div>
-      ${G.sections.map(s => {
-        const isLina = s.title.includes('玲娜贝儿');
-        const inner = `<div class="disney-grid">
-          ${s.items.map(it => `<div class="t">${it.time}</div><div class="w"><b>${it.what}</b>${it.note ? `<small>${it.note}</small>` : ''}</div>`).join('')}
-        </div>`;
-        return isLina ? `<div class="disney-highlight">
-          <span class="label">🎀 LIMITED · 限定</span>
-          <h4>${s.title}</h4>
-          ${inner}
-        </div>` : `<div class="disney-section">
-          <div class="disney-section-head"><span class="ico">${s.icon}</span><h4>${s.title}</h4></div>
-          ${inner}
-        </div>`;
-      }).join('')}
-    `;
+    function renderItems(items, withImg) {
+      return `<div class="disney-grid${withImg ? ' with-img' : ''}">
+        ${items.map(it => {
+          const imgCell = withImg ? `<div class="img-cell">${it.img ? `<img src="${it.img}" alt="${it.what}" loading="lazy" onerror="this.style.display='none'">` : ''}</div>` : '';
+          const zoneTag = it.zone ? `<span class="zone-tag">${it.zone}</span>` : '';
+          return `<div class="t">${it.time}</div>${imgCell}<div class="w"><b>${it.what}${zoneTag}</b>${it.note ? `<small>${it.note}</small>` : ''}</div>`;
+        }).join('')}
+      </div>`;
+    }
+    function renderParkMap(zones) {
+      const W = 600, Hh = 360;
+      const markers = zones.map(z => {
+        const cx = z.x * W / 100, cy = z.y * Hh / 100;
+        return `<g><circle cx="${cx}" cy="${cy}" r="32" fill="${z.color}" stroke="#fff" stroke-width="3" opacity="0.92"></circle><text x="${cx}" y="${cy - 2}" class="park-zone-emoji">${z.emoji}</text><text x="${cx}" y="${cy + 14}" class="park-zone-label">${z.name}</text></g>`;
+      }).join('');
+      const legend = zones.map(z => `<div class="park-legend-row"><div class="dot" style="background:${z.color}"></div><div><b>${z.emoji} ${z.name}</b><br><small>${z.note}</small></div></div>`).join('');
+      return `<div class="park-map"><h5>东京迪士尼海洋 · 8 大主题区</h5>
+        <svg viewBox="0 0 ${W} ${Hh}" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="sea2" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#9ec5d3"/><stop offset="100%" stop-color="#5e9dd6"/></linearGradient></defs>
+          <rect width="${W}" height="${Hh}" fill="url(#sea2)" rx="8"/>
+          <ellipse cx="300" cy="200" rx="240" ry="120" fill="#dcefe6" opacity="0.7"/>
+          ${markers}
+        </svg>
+        <div class="park-legend">${legend}</div></div>`;
+    }
+    function renderNews(news) {
+      return `<div class="news-list">
+        ${news.map(n => `<div class="news-item${n.urgent ? ' urgent' : ''}">
+          <div class="news-head"><span class="date">${n.date}</span><span class="tag">${n.tag}</span><h5>${n.title}</h5></div>
+          <p>${n.text}</p>
+          ${n.url ? `<a href="${n.url}" target="_blank">→ 官方</a>` : ''}
+        </div>`).join('')}
+      </div>`;
+    }
+    let html = `<div class="disney-head"><h3>${G.title}</h3><div class="sub">${G.subtitle}</div><div class="intro">${G.intro}</div></div>`;
+    if (G.parkZones && G.parkZones.length) {
+      html += `<div class="disney-section" style="border-top:0;padding-top:0"><div class="disney-section-head"><span class="ico">🗾</span><h4>园区分区图</h4></div>${renderParkMap(G.parkZones)}</div>`;
+    }
+    G.sections.forEach(s => {
+      const isLina = s.title.includes('玲娜贝儿');
+      const isTime = s.title.includes('黄金时刻表');
+      const inner = renderItems(s.items, isTime);
+      html += isLina
+        ? `<div class="disney-highlight"><span class="label">🎀 LIMITED · 限定</span><h4>${s.title}</h4>${inner}</div>`
+        : `<div class="disney-section"><div class="disney-section-head"><span class="ico">${s.icon}</span><h4>${s.title}</h4></div>${inner}</div>`;
+    });
+    if (G.news && G.news.length) {
+      html += `<div class="disney-section"><div class="disney-section-head"><span class="ico">📰</span><h4>最新动态 · 项目新闻</h4></div>${renderNews(G.news)}</div>`;
+    }
+    dg.innerHTML = html;
   }
 </script>
 </body>

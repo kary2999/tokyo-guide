@@ -1,6 +1,6 @@
-# 春节东京攻略 · 网页版
+# 东京 9 日攻略 · 网页版
 
-一份完整的春节东京 9 日游攻略,提供三套 UI 风格供选择,所有内容共享同一份数据,改一处全站同步。
+一份完整的东京 9 日游攻略,提供三套 UI 风格供选择,所有内容共享同一份数据,改一处全站同步。
 
 ## 文件结构
 
@@ -64,5 +64,4 @@ python3 -m http.server 8000
 
 ---
 
-Made with care for a real Tokyo trip · 2024 春节
-
+Made with care for a real Tokyo trip · Tokyo Trip
