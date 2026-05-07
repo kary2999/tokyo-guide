@@ -147,6 +147,50 @@
   .assess-hit .pill.lvl-2 { background: var(--tape-1); border-color: var(--orange); }
   .assess-hit .pill.lvl-3 { background: var(--tape-3); border-color: var(--red); color: var(--red); font-weight: 700; }
 
+  /* 每日更新 · 天气 + 新闻 */
+  .daily-card {
+    background: #fff; border: 2px solid var(--blue); border-radius: 16px;
+    padding: 1.4rem 1.6rem; box-shadow: 6px 6px 0 var(--pen-soft);
+    margin: 2rem 0 0;
+    position: relative;
+  }
+  .daily-card::before {
+    content: ""; position: absolute; top: -12px; left: 30px;
+    width: 140px; height: 22px;
+    background: var(--tape-4); transform: rotate(-2deg);
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  }
+  .daily-head { display: flex; align-items: center; gap: .8rem; margin-bottom: .8rem; flex-wrap: wrap; }
+  .daily-head h3 { font-family: "Caveat", cursive; font-size: 1.6rem; color: var(--pen); }
+  .daily-head .updated { font-size: .8rem; color: var(--pen-soft); margin-left: auto; font-family: "Patrick Hand", cursive; }
+  .daily-head .pending { background: var(--yellow); color: var(--pen); padding: .15rem .6rem; border-radius: 999px; font-size: .8rem; }
+  .weather-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+    gap: .6rem; margin-top: .8rem;
+  }
+  .wx-cell {
+    background: #f0f7ff; border: 1px solid #c5d8eb; border-radius: 10px;
+    padding: .6rem .4rem; text-align: center;
+    font-family: "Patrick Hand", cursive;
+  }
+  .wx-cell.today { background: var(--yellow); border-color: var(--orange); border-width: 2px; }
+  .wx-cell .d { font-size: .78rem; color: var(--pen-soft); }
+  .wx-cell .icon { font-size: 1.6rem; line-height: 1.2; }
+  .wx-cell .t { font-size: .9rem; color: var(--pen); }
+  .wx-cell .t b { color: var(--red); }
+  .wx-cell .pr { font-size: .72rem; color: var(--blue); }
+  .news-mini { display: flex; flex-direction: column; gap: .5rem; margin-top: .8rem; }
+  .news-mini-row { display: flex; gap: .5rem; padding: .4rem .6rem; background: #fffaaf; border-radius: 6px; font-size: .85rem; }
+  .news-mini-row a { color: var(--blue); text-decoration: none; }
+  .recommend-box {
+    margin-top: .8rem; padding: .8rem 1rem;
+    background: linear-gradient(120deg,#fff7c0,#ffd8a8);
+    border-left: 4px solid var(--orange);
+    border-radius: 6px;
+    font-family: "Patrick Hand", cursive;
+    font-size: .95rem; line-height: 1.6; color: var(--pen);
+  }
+
   /* 浮动贴纸 */
   .sticker {
     position: absolute; pointer-events: none; user-select: none;
@@ -596,6 +640,55 @@
     margin-left: .3rem; color: var(--pen);
   }
 
+  /* 官方地图 */
+  .official-map {
+    background: #fff;
+    border: 2px solid var(--pen);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+    box-shadow: 6px 6px 0 var(--pen-soft);
+  }
+  .official-map .map-img-wrap {
+    background: #f0e7d8;
+    cursor: zoom-in;
+    overflow: hidden;
+    position: relative;
+  }
+  .official-map .map-img-wrap img { display: block; width: 100%; height: auto; }
+  .official-map .map-img-wrap::after {
+    content: "🔍 点击查看大图"; position: absolute; bottom: 8px; right: 12px;
+    background: rgba(42,58,82,.85); color: #fff;
+    padding: .25rem .7rem; border-radius: 999px;
+    font-family: "Patrick Hand", cursive; font-size: .8rem;
+  }
+  .map-caption { padding: .8rem 1.2rem; background: var(--yellow); border-top: 1px dashed var(--pen-soft); font-size: .85rem; color: var(--pen); }
+  .map-usage {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: .8rem; padding: 1rem 1.2rem;
+    background: #fffaaf;
+    border-top: 1px dashed var(--pen-soft);
+  }
+  .map-usage-item {
+    display: flex; gap: .6rem; align-items: flex-start;
+    background: #fff; padding: .7rem .9rem;
+    border: 1px dashed var(--pen-soft); border-radius: 8px;
+  }
+  .map-usage-item .ic { font-size: 1.4rem; line-height: 1; flex-shrink: 0; }
+  .map-usage-item h6 { font-family: "Caveat", cursive; font-size: 1.1rem; color: var(--pen); margin-bottom: .15rem; }
+  .map-usage-item p { font-size: .82rem; line-height: 1.55; color: var(--pen-soft); }
+
+  /* 灯箱 */
+  .lightbox {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.85);
+    z-index: 9999; cursor: zoom-out;
+    align-items: center; justify-content: center; padding: 2rem;
+  }
+  .lightbox.show { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 100%; box-shadow: 0 0 40px rgba(0,0,0,.5); }
+  .lightbox .close { position: absolute; top: 1rem; right: 1.5rem; color: #fff; font-size: 2rem; background: none; border: 0; cursor: pointer; }
+
   /* 园区分区图 */
   .park-map {
     background: linear-gradient(135deg,#dceff0,#f0e7d8);
@@ -708,6 +801,7 @@
     <span>📍 东京·大阪·镰仓·富士</span>
   </div>
   <div id="assess-box"></div>
+  <div id="daily-box"></div>
 </header>
 
 <nav class="tabs">
@@ -790,6 +884,7 @@
 </footer>
 
 <script src="data.js"></script>
+<script src="dailyUpdate.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
   const D = window.GUIDE_DATA;
@@ -799,6 +894,46 @@
   D.meta.dateRange = `${H.fmtFull(tripDates[0])} — ${H.fmtFull(tripDates[8])}`;
   document.getElementById('date-range').textContent = D.meta.dateRange;
   document.getElementById('travelers').textContent = D.meta.travelers;
+
+  // 每日更新 · 天气 + 新闻
+  const dailyBox = document.getElementById('daily-box');
+  if (dailyBox) {
+    const DU = window.GUIDE_DAILY || { updatedAt: null };
+    let html = `<div class="daily-card"><div class="daily-head"><h3>📰 每日动态 · 天气 + 新闻</h3>`;
+    if (DU.updatedAt) {
+      html += `<span class="updated">最近更新:${DU.updatedAt}</span></div>`;
+      // 天气
+      if (DU.weather && DU.weather.length) {
+        html += `<div><b>未来 ${DU.weather.length} 天东京天气</b></div><div class="weather-grid">`;
+        DU.weather.forEach((w, i) => {
+          html += `<div class="wx-cell ${i===0?'today':''}">
+            <div class="d">${w.date}</div>
+            <div class="icon">${w.icon || '🌤️'}</div>
+            <div class="t">${w.temp_max}°/<b>${w.temp_min}°</b></div>
+            <div class="pr">${w.precipitation || 0}mm</div>
+          </div>`;
+        });
+        html += `</div>`;
+      }
+      // 新闻
+      if (DU.news && DU.news.length) {
+        html += `<div style="margin-top:.8rem"><b>最新动态</b></div><div class="news-mini">`;
+        DU.news.forEach(n => {
+          html += `<div class="news-mini-row"><span>📌</span><div><b>${n.title}</b> ${n.summary || ''} ${n.url ? `<a href="${n.url}" target="_blank">→</a>` : ''}</div></div>`;
+        });
+        html += `</div>`;
+      }
+      // 推荐
+      if (DU.recommend) {
+        html += `<div class="recommend-box">💡 ${DU.recommend}</div>`;
+      }
+    } else {
+      html += `<span class="pending">⏳ 等待首次更新</span></div>
+        <div class="recommend-box">这个区域将由定时任务自动填充:每天 <b>日本时间 11:00</b> 抓取 Tokyo 未来 10 天天气 + Disney/JR 最新动态,根据天气推荐当天玩什么(雨天 → 室内项目;晴天 → 富士山一日游)。</div>`;
+    }
+    html += `</div>`;
+    dailyBox.innerHTML = html;
+  }
 
   // 节假日评估
   const assess = H.assessTrip(tripDates);
@@ -1039,10 +1174,35 @@
         <div class="intro">${G.intro}</div>
       </div>
     `;
-    // 顶部插入园区分区图
-    if (G.parkZones && G.parkZones.length) {
+    // 顶部插入官方地图(用户上传)
+    if (G.officialMap) {
+      const M = G.officialMap;
       html += `<div class="disney-section" style="border-top:0;padding-top:0">
-        <div class="disney-section-head"><span class="ico">🗾</span><h4>园区分区图</h4></div>
+        <div class="disney-section-head"><span class="ico">🗺️</span><h4>官方地图 · 看图秘诀</h4></div>
+        <div class="official-map">
+          <div class="map-img-wrap" onclick="document.getElementById('lb-tds').classList.add('show')">
+            <img src="${M.thumb}" alt="${M.caption}" loading="lazy">
+          </div>
+          <div class="map-caption">📍 ${M.caption}</div>
+          <div class="map-usage">
+            ${M.usage.map(u => `
+              <div class="map-usage-item">
+                <div class="ic">${u.icon}</div>
+                <div><h6>${u.title}</h6><p>${u.text}</p></div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div id="lb-tds" class="lightbox" onclick="this.classList.remove('show')">
+          <button class="close" onclick="event.stopPropagation();this.parentElement.classList.remove('show')">×</button>
+          <img src="${M.full}" alt="${M.caption}">
+        </div>
+      </div>`;
+    }
+    // 园区分区图(简化 SVG 概念图,作为补充)
+    if (G.parkZones && G.parkZones.length) {
+      html += `<div class="disney-section">
+        <div class="disney-section-head"><span class="ico">🗾</span><h4>分区简化图(快速记位)</h4></div>
         ${renderParkMap(G.parkZones)}
       </div>`;
     }

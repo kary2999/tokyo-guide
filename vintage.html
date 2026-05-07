@@ -443,6 +443,21 @@
   .disney-grid.with-img .img-cell { width: 80px; height: 60px; overflow: hidden; border: 2px solid var(--ink); background: var(--paper-dark); filter: sepia(.18) saturate(.9); }
   .disney-grid.with-img .img-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .zone-tag { display: inline-block; background: var(--paper-dark); color: var(--ink); font-family: "Special Elite",monospace; font-size: .68rem; padding: .05rem .4rem; margin-left: .3rem; letter-spacing: .1em; }
+  /* 官方地图 */
+  .official-map { background: rgba(255,253,245,.7); border: 3px double var(--ink); margin: 1.2rem 0; box-shadow: 6px 6px 0 var(--paper-dark); }
+  .official-map .map-img-wrap { cursor: zoom-in; position: relative; border-bottom: 2px solid var(--ink); }
+  .official-map .map-img-wrap img { display: block; width: 100%; height: auto; filter: sepia(.08); }
+  .official-map .map-img-wrap::after { content: "ZOOM ↗"; position: absolute; bottom: 8px; right: 12px; background: var(--ink); color: var(--paper); padding: .25rem .8rem; font-family: "Special Elite",monospace; font-size: .75rem; letter-spacing: .15em; }
+  .map-caption { padding: .8rem 1.2rem; background: var(--paper-dark); font-size: .85rem; font-style: italic; }
+  .map-usage { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: .5rem; padding: 1rem 1.2rem; }
+  .map-usage-item { display: flex; gap: .6rem; padding: .7rem .9rem; border: 1px solid var(--line); background: rgba(255,253,245,.6); }
+  .map-usage-item .ic { font-size: 1.3rem; flex-shrink: 0; }
+  .map-usage-item h6 { font-family: "DM Serif Display","Noto Serif SC",serif; font-size: 1rem; }
+  .map-usage-item p { font-size: .82rem; line-height: 1.55; color: var(--ink-soft); }
+  .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 9999; cursor: zoom-out; align-items: center; justify-content: center; padding: 2rem; }
+  .lightbox.show { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 100%; }
+  .lightbox .close { position: absolute; top: 1rem; right: 1.5rem; color: #fff; font-size: 2rem; background: none; border: 0; cursor: pointer; }
   /* 园区分区图 */
   .park-map { background: rgba(255,253,245,.6); border: 2px solid var(--ink); padding: 1.2rem; margin: 1rem 0; }
   .park-map h5 { font-family: "DM Serif Display","Noto Serif SC",serif; text-align: center; font-size: 1.2rem; margin-bottom: .8rem; }
@@ -801,8 +816,20 @@
       </div>`;
     }
     let html = `<div class="disney-head"><h3>${G.title}</h3><div class="sub">${G.subtitle}</div><div class="intro">${G.intro}</div></div>`;
+    if (G.officialMap) {
+      const M = G.officialMap;
+      html += `<div class="disney-section" style="border-top:0;padding-top:0">
+        <div class="disney-section-head"><span class="ico">🗺️</span><h4>官方地图 · MAP & USAGE</h4></div>
+        <div class="official-map">
+          <div class="map-img-wrap" onclick="document.getElementById('lb-tds-v').classList.add('show')"><img src="${M.thumb}" alt="${M.caption}" loading="lazy"></div>
+          <div class="map-caption">${M.caption}</div>
+          <div class="map-usage">${M.usage.map(u => `<div class="map-usage-item"><div class="ic">${u.icon}</div><div><h6>${u.title}</h6><p>${u.text}</p></div></div>`).join('')}</div>
+        </div>
+        <div id="lb-tds-v" class="lightbox" onclick="this.classList.remove('show')"><button class="close" onclick="event.stopPropagation();this.parentElement.classList.remove('show')">×</button><img src="${M.full}" alt="${M.caption}"></div>
+      </div>`;
+    }
     if (G.parkZones && G.parkZones.length) {
-      html += `<div class="disney-section" style="border-top:0;padding-top:0"><div class="disney-section-head"><span class="ico">🗾</span><h4>园区分区图</h4></div>${renderParkMap(G.parkZones)}</div>`;
+      html += `<div class="disney-section"><div class="disney-section-head"><span class="ico">🗾</span><h4>分区简化图</h4></div>${renderParkMap(G.parkZones)}</div>`;
     }
     G.sections.forEach(s => {
       const isLina = s.title.includes('玲娜贝儿');

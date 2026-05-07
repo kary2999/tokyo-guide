@@ -485,6 +485,21 @@ window.GUIDE_DATA = {
     subtitle: "8:20 入场到 21:00 烟花的全天路线",
     intro: "9 天行程里最贵也最值的一天。门票 ¥8,400 起、DPA 单项 ¥1,500–2,500、餐饮 ¥3,000+,但用对方法可以从'人均 ¥1,800/小时'变成'¥800/小时'。下面是经过实战验证的 5 个模块。",
 
+    // 官方地图(用户上传的繁中版 PDF 转 JPG)
+    officialMap: {
+      thumb: "img/tds-map-thumb.jpg",
+      full: "img/tds-map.jpg",
+      caption: "Tokyo DisneySea 官方繁中地图 · 含 8 大主题区与编号项目",
+      usage: [
+        { icon: "🔢", title: "项目编号", text: "图中各项目都有编号,与图例栏一一对应,用 APP 抢卡时看编号最快。" },
+        { icon: "🎢", title: "游乐设施", text: "圆圈+车厢图标 = 游乐设施;绿底蓝字 = 适合所有年龄;红底白字 = 身高/年龄限制(图例右上有标注)。" },
+        { icon: "🍽️", title: "餐饮 / 商店", text: "刀叉图标 = 正餐;杯子图标 = 小食;购物袋 = 商店。每区都有标志性餐厅,选熟悉的标志快走。" },
+        { icon: "🚻", title: "服务设施", text: "右下角图例区有:厕所、AED、婴儿中心、储物柜、ATM、APP 客服中心。地图边缘标着各区出口位置。" },
+        { icon: "📱", title: "搭配 APP 用", text: "扫地图左上角的 QR 码下载官方 App;App 里能看实时排队时间、抢 DPA、点外卖到园内取餐位置。" },
+        { icon: "🆕", title: "右上'梦幻泉乡'", text: "2024.06 新开的 Fantasy Springs 主题区,需 Premier Access 或 Standby Pass 才能入区。" }
+      ]
+    },
+
     // 园区分区 — 用 SVG 渲染,坐标对应一张概念图(0-100% 网格)
     // 2024 年 Fantasy Springs 开园后共 8 大主题区
     parkZones: [
