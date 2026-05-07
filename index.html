@@ -417,6 +417,11 @@
     border: 1px solid #ddd;
     color: rgba(255,255,255,.95);
     text-shadow: 0 2px 8px rgba(0,0,0,.25);
+    overflow: hidden;
+  }
+  .polaroid-photo.has-img { padding: 0; }
+  .polaroid-photo img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
   }
   .polaroid h3 {
     font-family: "Caveat", cursive; font-size: 1.6rem;
@@ -622,17 +627,22 @@
   .disney-grid .w small {
     color: var(--pen-soft); font-size: .82rem;
   }
-  /* 时刻表 — 时间瓦片 + 图标(无误导图) */
-  .disney-grid.with-img { grid-template-columns: 90px 60px 1fr; }
+  /* 时刻表 — 真实地图裁切图 + 图标 fallback */
+  .disney-grid.with-img { grid-template-columns: 90px 80px 1fr; }
   .disney-grid.with-img .icon-tile {
-    width: 50px; height: 50px;
+    width: 70px; height: 56px;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.6rem; line-height: 1;
-    border-radius: 10px;
+    border-radius: 8px;
     border: 2px solid #fff;
     box-shadow: 2px 2px 0 var(--pen-soft);
-    background: var(--tape-2);
+    overflow: hidden;
     color: #fff;
+    background: var(--tape-2);
+  }
+  .disney-grid.with-img .icon-tile.has-img { background: #fff; padding: 0; }
+  .disney-grid.with-img .icon-tile img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
   }
   .disney-grid.with-img .zone-tag {
     display: inline-block; font-size: .72rem; padding: .05rem .4rem;
@@ -1028,8 +1038,13 @@
     const card = document.createElement('div');
     card.className = 'polaroid';
     const fallbackEmoji = a.emoji || emojiPool[i % emojiPool.length];
+    const photoBg = a.gradient || 'linear-gradient(135deg, var(--tape-2), var(--tape-4))';
+    const photoEl = a.image
+      ? `<img src="${a.image}" alt="${a.name}" loading="lazy" onerror="this.parentElement.innerHTML='${fallbackEmoji}';this.parentElement.style.background='${photoBg.replace(/'/g, '\\\'').replace(/"/g, '&quot;')}'">`
+      : fallbackEmoji;
+    const photoStyle = a.image ? 'background:#eee' : `background:${photoBg}`;
     card.innerHTML = `
-      <div class="polaroid-photo" style="background:${a.gradient || 'linear-gradient(135deg, var(--tape-2), var(--tape-4))'}">${fallbackEmoji}</div>
+      <div class="polaroid-photo${a.image ? ' has-img' : ''}" style="${photoStyle}">${photoEl}</div>
       <h3>${a.name} <span class="tag">${a.tag}</span></h3>
       <div class="info-row">
         <span>🕐 ${a.hours}</span>
@@ -1115,7 +1130,12 @@
     function renderItems(items, withImg) {
       return `<div class="disney-grid${withImg ? ' with-img' : ''}">
         ${items.map(it => {
-          const iconTile = withImg ? `<div class="icon-tile" style="background:${it.zoneColor || '#888'}">${it.icon || '•'}</div>` : '';
+          // 如果有 img(地图裁切图),显示图片;没有则用 emoji + 园区色块
+          const iconTile = withImg
+            ? (it.img
+                ? `<div class="icon-tile has-img" style="border-color:${it.zoneColor || '#888'}"><img src="${it.img}" alt="${it.zone || ''}" onerror="this.parentElement.innerHTML='${it.icon || '•'}';this.parentElement.classList.remove('has-img');this.parentElement.style.background='${it.zoneColor || '#888'}'"></div>`
+                : `<div class="icon-tile" style="background:${it.zoneColor || '#888'}">${it.icon || '•'}</div>`)
+            : '';
           const zoneTag = it.zone ? `<span class="zone-tag">${it.zone}</span>` : '';
           return `<div class="t">${it.time}</div>${iconTile}<div class="w"><b>${it.what}${zoneTag}</b>${it.note ? `<small>${it.note}</small>` : ''}</div>`;
         }).join('')}

@@ -239,6 +239,7 @@ window.GUIDE_DATA = {
     {
       name: "东京迪士尼海洋",
       emoji: "🎠",
+      image: "img/tds-map-thumb.jpg",
       tag: "必玩",
       hours: "9:00–21:00",
       price: "¥8,400 – 9,400",
@@ -258,6 +259,7 @@ window.GUIDE_DATA = {
     {
       name: "涩谷 SHIBUYA SKY",
       emoji: "🌃",
+      image: "https://commons.wikimedia.org/wiki/Special:FilePath/Shibuya_at_night.JPG?width=800",
       tag: "夜景",
       hours: "10:00–22:30",
       price: "¥2,500",
@@ -271,6 +273,7 @@ window.GUIDE_DATA = {
     {
       name: "Small Worlds 迷你博物馆",
       emoji: "🌍",
+      image: "https://commons.wikimedia.org/wiki/Special:FilePath/Tokyo_Big_Sight_2007.jpg?width=800",
       tag: "亲子",
       hours: "09:00–19:30",
       price: "成人 ¥2,700",
@@ -284,6 +287,7 @@ window.GUIDE_DATA = {
     {
       name: "御殿场奥特莱斯",
       emoji: "🛍️",
+      image: "https://commons.wikimedia.org/wiki/Special:FilePath/Mount_Fuji_and_Ashitaka_Mountains_from_Satta_Pass.JPG?width=800",
       tag: "购物",
       hours: "10:00–19:00",
       price: "—",
@@ -296,6 +300,7 @@ window.GUIDE_DATA = {
     {
       name: "富士急高原乐园",
       emoji: "🎢",
+      image: "https://commons.wikimedia.org/wiki/Special:FilePath/Mount_Fuji_and_Ashitaka_Mountains_from_Satta_Pass.JPG?width=800",
       tag: "刺激",
       hours: "9:00–17:00",
       price: "门票免费 / 单项付费",
@@ -309,6 +314,7 @@ window.GUIDE_DATA = {
     {
       name: "东京铁塔",
       emoji: "🗼",
+      image: "https://commons.wikimedia.org/wiki/Special:FilePath/Tokyo_Tower_and_around_Skyscrapers.jpg?width=800",
       tag: "经典",
       hours: "9:00–22:30",
       price: "Top Deck ¥2,800",
@@ -322,6 +328,7 @@ window.GUIDE_DATA = {
     {
       name: "晴空塔 SKYTREE",
       emoji: "📡",
+      image: "https://commons.wikimedia.org/wiki/Special:FilePath/Tokyo_Skytree_(1).JPG?width=800",
       tag: "夜景",
       hours: "08:00–22:00",
       price: "¥3,100",
@@ -335,6 +342,7 @@ window.GUIDE_DATA = {
     {
       name: "浅草寺",
       emoji: "⛩️",
+      image: "https://commons.wikimedia.org/wiki/Special:FilePath/Senso-ji_main_hall_012006.JPG?width=800",
       tag: "经典",
       hours: "06:00–17:00",
       price: "免费",
@@ -348,6 +356,7 @@ window.GUIDE_DATA = {
     {
       name: "镰仓高校前",
       emoji: "🚃",
+      image: "https://commons.wikimedia.org/wiki/Special:FilePath/Kamakura_Koko_Mae_Station_Enoden.JPG?width=800",
       tag: "拍照",
       hours: "全天",
       price: "免费",
@@ -360,6 +369,7 @@ window.GUIDE_DATA = {
     {
       name: "横滨高达工厂",
       emoji: "🤖",
+      image: "https://commons.wikimedia.org/wiki/Special:FilePath/Yokohama_Minatomirai_21_at_dusk_from_Yokohama_Bay_Bridge.jpg?width=800",
       tag: "热血",
       hours: "11:00–20:00",
       price: "¥1,650",
@@ -372,6 +382,7 @@ window.GUIDE_DATA = {
     {
       name: "墨田水族馆",
       emoji: "🐠",
+      image: "https://commons.wikimedia.org/wiki/Special:FilePath/Tokyo_Skytree_(1).JPG?width=800",
       tag: "亲子",
       hours: "9:00–21:00",
       price: "¥2,500",
@@ -384,6 +395,7 @@ window.GUIDE_DATA = {
     {
       name: "三鹰之森吉卜力美术馆",
       emoji: "🎬",
+      image: "https://commons.wikimedia.org/wiki/Special:FilePath/Ghibli_Museum.jpg?width=800",
       tag: "动漫",
       hours: "10:00–17:00",
       price: "¥3,773",
@@ -397,6 +409,7 @@ window.GUIDE_DATA = {
     {
       name: "横滨中华街 + 元町",
       emoji: "🏮",
+      image: "https://commons.wikimedia.org/wiki/Special:FilePath/Yokohama_Chinatown_at_night.jpg?width=800",
       tag: "城游",
       hours: "全天",
       price: "免费",
@@ -559,23 +572,25 @@ window.GUIDE_DATA = {
       {
         icon: "⏰", title: "黄金时刻表 · 时间就是钱",
         items: [
+          // 出发段:无地图,留 emoji
           { time: "05:51", icon: "🚆", what: "京叶线坐到东京站",                 note: "第一班车,¥230",                          zone: "出发",            zoneColor: "#5e9dd6" },
           { time: "06:07", icon: "🚇", what: "东京站 → 舞滨站",                   note: "京叶线 11 分钟",                          zone: "出发",            zoneColor: "#5e9dd6" },
           { time: "06:25", icon: "🚶", what: "步行 15 分钟到正门",                 note: "出站后跟人流即可",                        zone: "正门",            zoneColor: "#888888" },
-          { time: "08:20", icon: "🏰", what: "实际开门(官方 8:30)",               note: "度假村酒店住客再早 15 min",                 zone: "地中海港湾",      zoneColor: "#d8a86a" },
+          // 入园后:用官方地图各区裁切作为参照(真实位置)
+          { time: "08:20", icon: "🏰", what: "实际开门(官方 8:30)",               note: "度假村酒店住客再早 15 min",                 zone: "地中海港湾",      zoneColor: "#d8a86a", img: "img/tds/med-harbor.jpg" },
           { time: "08:30", icon: "📱", what: "立刻抢入场卡 + APP DPA",             note: "翱翔梦幻奇航、美人鱼、印第安纳琼斯优先",         zone: "全园",            zoneColor: "#444444" },
-          { time: "09:00", icon: "🛫", what: "翱翔梦幻奇航 Soaring",                note: "首选,5D 飞行模拟,刚入园人最多",            zone: "美国海滨",        zoneColor: "#c87575" },
-          { time: "10:00", icon: "🐙", what: "海底两万里 20,000 Leagues",          note: "美人鱼礁湖经典",                          zone: "美人鱼礁湖",      zoneColor: "#d486b0" },
-          { time: "11:30", icon: "🚢", what: "水上花车第 1 场",                    note: "找好位子提前 30 min",                       zone: "地中海港湾",      zoneColor: "#d8a86a" },
+          { time: "09:00", icon: "🛫", what: "翱翔梦幻奇航 Soaring",                note: "首选,5D 飞行模拟,刚入园人最多",            zone: "美国海滨",        zoneColor: "#c87575", img: "img/tds/amer-waterfr.jpg" },
+          { time: "10:00", icon: "🐙", what: "海底两万里 20,000 Leagues",          note: "美人鱼礁湖经典",                          zone: "美人鱼礁湖",      zoneColor: "#d486b0", img: "img/tds/mermaid.jpg" },
+          { time: "11:30", icon: "🚢", what: "水上花车第 1 场",                    note: "找好位子提前 30 min",                       zone: "地中海港湾",      zoneColor: "#d8a86a", img: "img/tds/med-harbor.jpg" },
           { time: "12:00", icon: "🎟️", what: "红色项目 DPA、橘色入场卡",          note: "开抢下午的约",                            zone: "全园",            zoneColor: "#444444" },
-          { time: "13:00", icon: "🎢", what: "印第安纳琼斯·愤怒双神",              note: "1 分半过山车,刺激",                       zone: "失落河三角洲",    zoneColor: "#7a8c5a" },
-          { time: "14:05", icon: "🚢", what: "水上花车第 2 场",                    note: "也可改逛美国海滨",                         zone: "地中海港湾",      zoneColor: "#d8a86a" },
-          { time: "15:00", icon: "🪔", what: "辛巴达 / 神灯剧场",                   note: "排队短的备选",                            zone: "阿拉伯海岸",      zoneColor: "#c8923a" },
-          { time: "16:05", icon: "🚢", what: "水上花车第 3 场",                    note: "下午最后一场",                            zone: "地中海港湾",      zoneColor: "#d8a86a" },
-          { time: "17:00", icon: "❄️", what: "Fantasy Springs 范达海",             note: "新区!冰雪/彼得潘/长发公主,需预约入区",        zone: "Fantasy Springs", zoneColor: "#7e57c2" },
-          { time: "18:35", icon: "🎷", what: "动感大乐团",                          note: "码头湖畔的 LIVE",                         zone: "地中海港湾",      zoneColor: "#d8a86a" },
-          { time: "19:20", icon: "✨", what: "梦之海 Believe",                       note: "夜间水上灯光秀",                          zone: "地中海港湾",      zoneColor: "#d8a86a" },
-          { time: "20:30", icon: "🎆", what: "压轴烟花秀",                          note: "最佳位置:火山附近 / 中央湖畔",             zone: "地中海港湾",      zoneColor: "#d8a86a" }
+          { time: "13:00", icon: "🎢", what: "印第安纳琼斯·愤怒双神",              note: "1 分半过山车,刺激",                       zone: "失落河三角洲",    zoneColor: "#7a8c5a", img: "img/tds/lost-river.jpg" },
+          { time: "14:05", icon: "🚢", what: "水上花车第 2 场",                    note: "也可改逛美国海滨",                         zone: "地中海港湾",      zoneColor: "#d8a86a", img: "img/tds/med-harbor.jpg" },
+          { time: "15:00", icon: "🪔", what: "辛巴达 / 神灯剧场",                   note: "排队短的备选",                            zone: "阿拉伯海岸",      zoneColor: "#c8923a", img: "img/tds/arabian.jpg" },
+          { time: "16:05", icon: "🚢", what: "水上花车第 3 场",                    note: "下午最后一场",                            zone: "地中海港湾",      zoneColor: "#d8a86a", img: "img/tds/med-harbor.jpg" },
+          { time: "17:00", icon: "❄️", what: "Fantasy Springs 范达海",             note: "新区!冰雪/彼得潘/长发公主,需预约入区",        zone: "Fantasy Springs", zoneColor: "#7e57c2", img: "img/tds/fantasy.jpg" },
+          { time: "18:35", icon: "🎷", what: "动感大乐团",                          note: "码头湖畔的 LIVE",                         zone: "地中海港湾",      zoneColor: "#d8a86a", img: "img/tds/med-harbor.jpg" },
+          { time: "19:20", icon: "✨", what: "梦之海 Believe",                       note: "夜间水上灯光秀",                          zone: "地中海港湾",      zoneColor: "#d8a86a", img: "img/tds/med-harbor.jpg" },
+          { time: "20:30", icon: "🎆", what: "压轴烟花秀",                          note: "最佳位置:火山附近 / 中央湖畔",             zone: "地中海港湾",      zoneColor: "#d8a86a", img: "img/tds/mysterious.jpg" }
         ]
       },
       {
