@@ -271,12 +271,12 @@
   }
   .attr-photo {
     height: 180px;
-    background-size: cover; background-position: center;
     background-color: var(--pink-soft);
-    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 4.5rem; line-height: 1;
+    color: rgba(255,255,255,.95);
+    text-shadow: 0 2px 10px rgba(0,0,0,.2);
   }
-  .attr-photo.no-img { display: flex; align-items: center; justify-content: center; font-size: 3.5rem; }
-  .attr-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .attr-card-body { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
   .attr-card::before {
     content: ""; position: absolute; top: -30px; right: -30px;
@@ -364,10 +364,16 @@
     margin-bottom: .6rem;
   }
   .disney-highlight h4 { font-size: 1.3rem; color: var(--pink-deep); margin-bottom: .8rem; }
-  /* 时刻表配图 */
-  .disney-grid.with-img { grid-template-columns: 100px 88px 1fr; }
-  .disney-grid.with-img .img-cell { width: 80px; height: 60px; border-radius: 10px; overflow: hidden; background: var(--pink-soft); }
-  .disney-grid.with-img .img-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  /* 时刻表图标瓦片(无图片) */
+  .disney-grid.with-img { grid-template-columns: 100px 60px 1fr; }
+  .disney-grid.with-img .icon-tile {
+    width: 50px; height: 50px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; line-height: 1;
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    color: #fff;
+  }
   .zone-tag { display: inline-block; background: var(--pink-soft); color: var(--pink-deep); font-size: .72rem; padding: .05rem .5rem; border-radius: 999px; margin-left: .3rem; }
   /* 官方地图 */
   .official-map { background: #fff; border-radius: 18px; overflow: hidden; margin: 1.2rem 0; box-shadow: var(--shadow-strong); border: 1px solid rgba(255,138,171,.2); }
@@ -624,9 +630,7 @@
     card.className = 'attr-card';
     const photoBg = a.gradient || 'linear-gradient(135deg,var(--pink-soft),var(--pink))';
     card.innerHTML = `
-      <div class="attr-photo" style="background:${photoBg}">
-        ${a.image ? `<img src="${a.image}" alt="${a.name}" loading="lazy" onerror="this.style.display='none'">` : ''}
-      </div>
+      <div class="attr-photo no-img" style="background:${photoBg}">${a.emoji || '✨'}</div>
       <div class="attr-card-body">
         <div class="attr-head">
           <div class="attr-name">${a.name}</div>
@@ -717,9 +721,9 @@
     function renderItems(items, withImg) {
       return `<div class="disney-grid${withImg ? ' with-img' : ''}">
         ${items.map(it => {
-          const imgCell = withImg ? `<div class="img-cell">${it.img ? `<img src="${it.img}" alt="${it.what}" loading="lazy" onerror="this.style.display='none'">` : ''}</div>` : '';
+          const iconTile = withImg ? `<div class="icon-tile" style="background:${it.zoneColor || '#888'}">${it.icon || '•'}</div>` : '';
           const zoneTag = it.zone ? `<span class="zone-tag">${it.zone}</span>` : '';
-          return `<div class="t">${it.time}</div>${imgCell}<div class="w"><b>${it.what}${zoneTag}</b>${it.note ? `<small>${it.note}</small>` : ''}</div>`;
+          return `<div class="t">${it.time}</div>${iconTile}<div class="w"><b>${it.what}${zoneTag}</b>${it.note ? `<small>${it.note}</small>` : ''}</div>`;
         }).join('')}
       </div>`;
     }
